@@ -1,0 +1,2020 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="theme-color" content="#060b17">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.json">
+<title>科创预测分析系统</title>
+<style>
+/* ============================================================
+   科创预测分析系统 · 深色科技风视觉 v2.0
+   全部类名/ID 与 JS 逻辑完全兼容，仅升级视觉表现
+   ============================================================ */
+:root{
+  --bg0:#060b17; --bg1:#0b1428; --bg2:#101d3a;
+  --card:rgba(148,178,255,.055); --card2:rgba(148,178,255,.09);
+  --line:rgba(160,190,255,.13); --line2:rgba(160,190,255,.22);
+  --text:#f4f8ff; --sub:#a9bce0; --dim:#7d93bd;
+  --red:#ff5d6c; --blue:#4f8cff; --purple:#8a6bff; --cyan:#35d0e8;
+  --gold:#f0b24a; --green:#34d399; --accent:#4f8cff;
+  --glow-r:rgba(255,93,108,.5); --glow-b:rgba(79,140,255,.5); --glow-g:rgba(240,178,74,.45);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{
+  background:var(--bg0);color:var(--text);
+  font-family:'PingFang SC','HarmonyOS Sans SC','Microsoft YaHei',system-ui,sans-serif;
+  font-size:14px;line-height:1.55;
+  min-height:100%;overflow-x:hidden;
+}
+/* 深空背景：多层光晕 + 微网格 */
+body::before{
+  content:'';position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(900px 500px at 85% -5%, rgba(79,140,255,.18), transparent 60%),
+    radial-gradient(700px 450px at -10% 25%, rgba(138,107,255,.14), transparent 60%),
+    radial-gradient(800px 500px at 55% 110%, rgba(53,208,232,.10), transparent 60%),
+    linear-gradient(160deg,var(--bg1),var(--bg0) 55%,#080e1e);
+}
+body::after{
+  content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(rgba(130,160,255,.035) 1px,transparent 1px),
+                   linear-gradient(90deg,rgba(130,160,255,.035) 1px,transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 80%);
+  -webkit-mask-image:radial-gradient(ellipse at 50% 0%,#000 30%,transparent 80%);
+}
+#app{max-width:520px;margin:0 auto;padding:0 0 76px;position:relative;}
+/* ===== 顶栏 ===== */
+header{
+  position:sticky;top:0;z-index:20;
+  background:linear-gradient(180deg,rgba(8,16,34,.95),rgba(10,18,38,.82));
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+  padding:14px 18px 12px;
+  display:flex;align-items:center;gap:12px;
+}
+header::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,rgba(79,140,255,.6),rgba(138,107,255,.6),transparent);
+}
+header .hd-mark{
+  width:38px;height:38px;flex-shrink:0;border-radius:11px;
+  background:linear-gradient(135deg,#2b6bff,#8a6bff 60%,#c65bff);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:#fff;
+  box-shadow:0 0 0 1px rgba(140,170,255,.4), 0 4px 18px rgba(79,140,255,.5), inset 0 1px 0 rgba(255,255,255,.35);
+  position:relative;overflow:hidden;
+}
+header .hd-mark::before{
+  content:'';position:absolute;top:0;left:8%;right:8%;height:1px;
+  background:linear-gradient(90deg,transparent,#fff,transparent);opacity:.85;
+}
+header .hd-mark::after{
+  content:'';position:absolute;inset:-5px;border-radius:15px;pointer-events:none;
+  background:conic-gradient(from 0deg,transparent 0 68%,rgba(140,210,255,.9) 86%,transparent 100%);
+  -webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1px));
+  mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1px));
+  animation:spin 3.4s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+header .hd-txt{min-width:0;}
+header h1{
+  font-size:16.5px;font-weight:800;letter-spacing:1px;
+  background:linear-gradient(90deg,#fff 25%,#9cc4ff 70%,#b9a5ff);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  text-shadow:0 0 18px rgba(120,170,255,.35);
+  display:flex;align-items:center;gap:8px;white-space:nowrap;
+}
+header h1 .engine{
+  font-size:8.5px;font-weight:700;letter-spacing:1.5px;color:#7fd8ff;
+  border:1px solid rgba(127,216,255,.35);border-radius:20px;padding:1px 7px;
+  background:rgba(53,208,232,.08);
+  -webkit-text-fill-color:#7fd8ff;
+  text-shadow:0 0 10px rgba(53,208,232,.7);
+  animation:pulseGlow 2.6s ease-in-out infinite;
+}
+@keyframes pulseGlow{0%,100%{box-shadow:0 0 4px rgba(53,208,232,.25);}50%{box-shadow:0 0 12px rgba(53,208,232,.75);}}
+header .sub{font-size:11px;color:var(--sub);margin-top:3px;opacity:.95;letter-spacing:.2px;}
+.sync-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:4px;vertical-align:middle;box-shadow:0 0 8px rgba(52,211,153,.8);}
+.sync-dot.off{background:var(--dim);box-shadow:none;}
+/* ===== 导航 ===== */
+nav{
+  position:sticky;top:0;z-index:19;
+  display:flex;gap:4px;padding:8px 10px 0;
+  background:rgba(8,15,32,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--line);
+}
+nav button{
+  flex:1;padding:8px 0 10px;border:none;background:transparent;
+  font-size:12.5px;color:var(--sub);font-family:inherit;cursor:pointer;
+  border-radius:12px 12px 0 0;transition:all .25s;position:relative;font-weight:500;
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+}
+nav button i{font-style:normal;font-size:15px;line-height:1;opacity:.72;transition:all .25s;}
+nav button.on{
+  color:#fff;font-weight:700;
+  background:linear-gradient(180deg,rgba(79,140,255,.18),rgba(10,18,38,0));
+  text-shadow:0 0 14px rgba(120,170,255,.7);
+}
+nav button.on i{opacity:1;transform:translateY(-1px);filter:drop-shadow(0 0 6px rgba(120,180,255,.9));}
+nav button::after{
+  content:'';position:absolute;left:22%;right:22%;bottom:0;height:2.5px;border-radius:2px;
+  background:linear-gradient(90deg,#4f8cff,#8a6bff);opacity:0;transform:scaleX(.3);transition:all .3s;
+  box-shadow:0 0 10px rgba(120,150,255,.9);
+}
+nav button.on::after{opacity:1;transform:scaleX(1);}
+main{padding:14px 14px 10px;}
+.tab{display:none;} .tab.on{display:block;animation:fadeIn .28s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
+/* ===== 卡片 ===== */
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:16px;padding:13px 15px;margin-bottom:13px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  box-shadow:0 4px 20px rgba(3,8,20,.35);
+  transition:border-color .2s;
+}
+.card h2{font-size:14.5px;font-weight:800;margin-bottom:9px;display:flex;justify-content:space-between;align-items:center;color:var(--text);}
+.card h2 .tag{font-size:10.5px;font-weight:500;color:var(--sub);background:rgba(148,178,255,.08);padding:2px 8px;border-radius:20px;}
+.switch{display:flex;background:rgba(10,18,38,.7);border:1px solid var(--line);border-radius:12px;padding:3px;margin-bottom:13px;backdrop-filter:blur(6px);}
+.switch button{flex:1;padding:9px 0;border:none;border-radius:9px;background:transparent;font-size:14px;color:var(--sub);font-family:inherit;cursor:pointer;transition:all .2s;font-weight:600;}
+.switch button.on{
+  background:linear-gradient(135deg,#2b4a86,#1f3560);color:#fff;font-weight:700;
+  box-shadow:0 2px 12px rgba(79,140,255,.35), inset 0 0 0 1px rgba(120,170,255,.35);
+}
+/* ===== 主推卡 ===== */
+.maincard{
+  position:relative;overflow:hidden;
+  background:linear-gradient(160deg,rgba(79,140,255,.13),rgba(10,18,38,.4) 45%,rgba(240,178,74,.08));
+  border:1px solid rgba(120,170,255,.35);
+  box-shadow:0 0 0 1px rgba(79,140,255,.08), 0 8px 32px rgba(20,40,90,.45), inset 0 1px 0 rgba(255,255,255,.06);
+}
+.maincard .balls .ball{width:44px;height:44px;font-size:18px;box-shadow:0 4px 16px rgba(79,140,255,.5), inset 0 -3px 5px rgba(0,0,0,.28);}
+  .maincard::before{content:'★ 主推';position:absolute;top:0;right:0;background:linear-gradient(135deg,#f0b24a,#e08a1e);color:#1a1205;font-size:10px;padding:4px 12px;border-radius:0 0 0 12px;font-weight:800;letter-spacing:.5px;box-shadow:0 2px 8px rgba(240,178,74,.4);}
+.maincard::after{
+  content:'';position:absolute;top:-60%;right:-30%;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,140,255,.22),transparent 65%);pointer-events:none;
+}
+.period-line{font-size:12.5px;color:var(--sub);margin-bottom:8px;display:flex;align-items:center;gap:6px;font-weight:600;}
+.period-line::before{content:'';width:4px;height:12px;border-radius:2px;background:linear-gradient(180deg,#4f8cff,#8a6bff);}
+.balls{display:flex;flex-wrap:wrap;gap:7px;margin:8px 0;position:relative;z-index:1;}
+.ball{
+  width:38px;height:38px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15.5px;font-weight:800;color:#fff;
+  border:1px solid rgba(255,255,255,.3);
+}
+.ball.r{
+  background:radial-gradient(circle at 32% 28%,#ffb3b8,#ff5d6c 55%,#c22a3a);
+  box-shadow:0 3px 12px var(--glow-r), inset 0 -3px 5px rgba(0,0,0,.28);
+}
+.ball.b{
+  background:radial-gradient(circle at 32% 28%,#bcd8ff,#4f8cff 55%,#2855c9);
+  box-shadow:0 3px 12px var(--glow-b), inset 0 -3px 5px rgba(0,0,0,.28);
+}
+.ball.s{
+  background:radial-gradient(circle at 32% 28%,#ffe3ad,#f0b24a 55%,#c07f1a);
+  box-shadow:0 3px 10px var(--glow-g), inset 0 -3px 5px rgba(0,0,0,.25);
+  width:31px;height:31px;font-size:12.5px;
+}
+.meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(96px,1fr));gap:7px;margin-top:10px;position:relative;z-index:1;}
+.meta-item{background:rgba(148,178,255,.07);border:1px solid rgba(148,178,255,.09);border-radius:10px;padding:6px 9px;font-size:10.5px;color:var(--sub);}
+.meta-item b{display:block;font-size:12px;color:var(--text);margin-top:2px;font-weight:700;}
+/* ===== 模型列表 ===== */
+.model-list .mrow{
+  display:flex;justify-content:space-between;align-items:center;padding:9px 2px;
+  border-bottom:1px solid rgba(148,178,255,.08);cursor:pointer;transition:background .15s;border-radius:8px;
+}
+.model-list .mrow:last-child{border-bottom:none;}
+.model-list .mrow:hover{background:rgba(148,178,255,.05);}
+.mrow .mname{font-size:12px;color:var(--sub);width:100px;flex-shrink:0;position:relative;font-weight:500;}
+.mrow .mname:after{content:'▸';position:absolute;right:-2px;top:50%;transform:translateY(-50%);font-size:10px;color:var(--dim);transition:transform .2s;}
+.mrow.open .mname:after{transform:translateY(-50%) rotate(90deg);}
+.mrow .mballs{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end;}
+.mrow .mball{
+  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#fff;border:1px solid rgba(255,255,255,.25);
+}
+.mrow .mball.r{background:radial-gradient(circle at 32% 28%,#ff9aa2,#e04a58 60%,#a92a38);box-shadow:0 2px 8px rgba(255,93,108,.35);}
+.mrow .mball.b{background:radial-gradient(circle at 32% 28%,#9cc0ff,#3f76e0 60%,#2a4fa8);box-shadow:0 2px 8px rgba(79,140,255,.35);}
+.mdetail{display:none;padding:10px 12px;background:rgba(148,178,255,.06);border:1px solid rgba(148,178,255,.1);border-radius:10px;margin:6px 0;font-size:11px;color:var(--sub);line-height:1.65;}
+.mrow.open+.mdetail{display:block;animation:fadeIn .2s ease;}
+.mdetail .mstrat{font-weight:700;color:#7fb0ff;margin-bottom:4px;}
+.mdetail .mlogic{color:var(--sub);margin-bottom:6px;}
+.mdetail .mstats{display:flex;flex-wrap:wrap;gap:6px;}
+.mdetail .mstat{background:rgba(10,18,38,.6);padding:3px 9px;border-radius:7px;border:1px solid rgba(148,178,255,.12);}
+/* ===== 复式 ===== */
+#tab-fushi .mball{display:inline-flex;width:27px;height:27px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-right:5px;vertical-align:middle;border:1px solid rgba(255,255,255,.2);}
+#tab-fushi .mball.r{background:radial-gradient(circle at 32% 28%,#ff9aa2,#e04a58 60%,#a92a38);}
+#tab-fushi .mball.b{background:radial-gradient(circle at 32% 28%,#9cc0ff,#3f76e0 60%,#2a4fa8);}
+.combo-group{margin:11px 0;padding:11px 12px;background:rgba(148,178,255,.05);border:1px solid var(--line);border-radius:12px;}
+.combo-title{font-weight:800;font-size:14px;margin-bottom:6px;color:var(--text);}
+/* ===== 历史 ===== */
+.his-row{display:flex;align-items:center;gap:9px;padding:8px 2px;border-bottom:1px solid rgba(148,178,255,.08);font-size:12px;}
+.his-row:last-child{border-bottom:none;}
+.his-row .p{color:var(--sub);width:52px;flex-shrink:0;font-weight:600;}
+.his-row .balls{display:flex;gap:4px;margin:0;flex-wrap:wrap;}
+.his-row .hball{
+  width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.2);
+}
+.his-row .hball.r{background:radial-gradient(circle at 32% 28%,#f08b93,#d8404e 60%,#98232f);}
+.his-row .hball.b{background:radial-gradient(circle at 32% 28%,#8cb2f5,#3568c9 60%,#24498f);}
+.freq-wrap{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px;}
+.fcell{width:31px;height:31px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;border:1px solid rgba(255,255,255,.15);}
+/* ===== 回测核验 ===== */
+.bar-row{display:flex;align-items:center;gap:9px;margin:8px 0;}
+.bar-row .nm{width:68px;font-size:12px;color:var(--sub);flex-shrink:0;text-align:right;font-weight:500;}
+.bar-track{flex:1;height:18px;background:rgba(10,18,38,.7);border-radius:9px;overflow:hidden;border:1px solid rgba(148,178,255,.08);}
+.bar-fill{height:100%;border-radius:9px;background:linear-gradient(90deg,#6f9bff,#4f8cff);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11px;font-weight:700;color:#fff;min-width:30px;box-shadow:0 0 10px rgba(79,140,255,.4);}
+.bar-fill.top{background:linear-gradient(90deg,#f5c86e,#f0b24a);box-shadow:0 0 10px rgba(240,178,74,.4);}
+.sig-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.sig-table th,.sig-table td{padding:7px 4px;text-align:left;border-bottom:1px solid rgba(148,178,255,.09);}
+.sig-table th{color:var(--sub);font-weight:600;font-size:11px;}
+.ok{color:#34d399;font-weight:700;} .no{color:#ff5d6c;font-weight:700;}
+.fb-box{padding:10px 12px;background:rgba(148,178,255,.08);border:1px solid rgba(148,178,255,.14);border-radius:10px;margin:7px 0;font-size:13px;}
+.fb-box .fb-top{display:flex;justify-content:space-between;color:var(--sub);margin-bottom:4px;}
+/* ===== 关于 ===== */
+/* ===== 关于(可折叠卡片) ===== */
+.about-card-h{display:flex;align-items:center;gap:7px;cursor:pointer;user-select:none;padding:3px 0;border-radius:8px;}
+.about-card-h:active{opacity:.7;}
+.about-card-h h2{margin:0;flex:1;}
+.about-caret{display:inline-block;width:16px;height:16px;line-height:14px;text-align:center;border:1px solid rgba(148,178,255,.35);border-radius:4px;color:var(--acc,#8aa8ff);font-size:11px;transition:transform .2s;flex:none;}
+.about-card.collapsed .about-caret{transform:rotate(-90deg);}
+.about-card.collapsed .about-card-b{display:none;}
+.about-card-b{animation:aboutFade .2s ease;}
+@keyframes aboutFade{from{opacity:0;transform:translateY(-3px);}to{opacity:1;transform:none;}}
+
+.about-line{margin:9px 0;font-size:13px;color:var(--sub);}
+.about-line b{color:var(--text);}
+.vm-stage{background:rgba(148,178,255,.06);border:1px solid rgba(148,178,255,.1);border-radius:10px;padding:9px 11px;font-size:12px;color:var(--sub);margin-bottom:9px;line-height:1.65;}
+.note{font-size:12px;color:var(--sub);margin-top:8px;line-height:1.7;}
+/* ===== 选号 ===== */
+.pick-grid{display:flex;flex-wrap:wrap;gap:7px;}
+.pick{
+  width:37px;height:37px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;border:1px solid rgba(148,178,255,.25);
+  background:rgba(148,178,255,.08);color:var(--sub);cursor:pointer;user-select:none;transition:all .18s;
+}
+.pick.r.on{
+  background:radial-gradient(circle at 32% 28%,#ff8a93,#e04a58 60%,#a92a38);border-color:#ff7a86;color:#fff;
+  box-shadow:0 3px 10px rgba(255,93,108,.4);transform:scale(1.06);
+}
+.pick.b.on{
+  background:radial-gradient(circle at 32% 28%,#8cb2f5,#3f76e0 60%,#2a4fa8);border-color:#7aa5f5;color:#fff;
+  box-shadow:0 3px 10px rgba(79,140,255,.4);transform:scale(1.06);
+}
+.pickline{display:flex;align-items:flex-start;gap:9px;margin:9px 0;}
+.pickline .lab{width:64px;font-size:13px;color:var(--sub);flex-shrink:0;padding-top:9px;font-weight:700;}
+.sel-btns{display:flex;gap:9px;margin-top:12px;}
+.sel-btn{
+  flex:1;padding:11px 0;border:none;border-radius:12px;cursor:pointer;font-size:14px;font-family:inherit;
+  background:rgba(148,178,255,.1);color:var(--text);font-weight:600;transition:all .2s;
+  border:1px solid rgba(148,178,255,.15);
+}
+.sel-btn:active{transform:scale(.97);}
+.sel-btn.p{
+  background:linear-gradient(135deg,#3f76e0,#2b4a86);color:#fff;font-weight:700;
+  border:none;box-shadow:0 4px 16px rgba(79,140,255,.4);
+}
+/* ===== 组合票 ===== */
+.combo-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;}
+.ctab{padding:5px 13px;border:1px solid rgba(148,178,255,.22);border-radius:16px;font-size:12px;background:rgba(148,178,255,.05);color:var(--sub);cursor:pointer;font-family:inherit;transition:all .2s;}
+.ctab.on{background:linear-gradient(135deg,#4f8cff,#8a6bff);color:#fff;border-color:transparent;font-weight:700;box-shadow:0 3px 12px rgba(79,140,255,.4);}
+.combo-sub{font-size:12px;color:var(--sub);margin-bottom:7px;font-weight:600;}
+.combo-row{display:flex;align-items:center;gap:2px;padding:4px 0;font-size:12px;flex-wrap:wrap;line-height:1.8;color:var(--text);border-bottom:1px dashed rgba(148,178,255,.1);}
+.combo-row:last-child{border-bottom:none;}
+.cno{display:inline-block;min-width:20px;color:var(--dim);font-size:11px;font-weight:600;}
+.combo-pane .mball{display:inline-flex;width:23px;height:23px;border-radius:50%;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-right:3px;border:1px solid rgba(255,255,255,.2);}
+.combo-pane .mball.r{background:radial-gradient(circle at 32% 28%,#f08b93,#d8404e 60%,#98232f);}
+.combo-pane .mball.b{background:radial-gradient(circle at 32% 28%,#8cb2f5,#3568c9 60%,#24498f);}
+.cplus{color:var(--dim);margin:0 5px;font-weight:700;}
+/* ===== 预测栏 各模型/融合 号码球（v1.6.8：修复无样式纯文本问题+红蓝圆球） ===== */
+#tab-predict .mball{display:inline-flex;align-items:center;justify-content:center;border-radius:50%;color:#fff;font-weight:800;margin-right:3px;border:1px solid rgba(255,255,255,.25);box-sizing:border-box;}
+#tab-predict .mball.r{background:radial-gradient(circle at 32% 28%,#ff9aa2,#e04a58 60%,#a92a38);box-shadow:0 1px 6px rgba(255,93,108,.35);}
+#tab-predict .mball.b{background:radial-gradient(circle at 32% 28%,#9cc0ff,#3f76e0 60%,#2a4fa8);box-shadow:0 1px 6px rgba(79,140,255,.35);}
+/* ===== 自设条件选号 ===== */
+.cond-form{padding:9px 0;}
+.cond-group{margin-bottom:9px;padding-bottom:7px;border-bottom:1px dashed rgba(148,178,255,.12);}
+.cond-group:last-child{border-bottom:none;}
+.cond-group-title{font-size:12px;font-weight:700;color:#7fb0ff;margin-bottom:5px;padding-left:2px;}
+.cond-row{display:flex;align-items:center;gap:10px;padding:6px 0;}
+.cond-row label{width:70px;font-size:13px;color:var(--sub);flex-shrink:0;font-weight:500;}
+.cond-input{flex:1;padding:8px 11px;border:1px solid rgba(148,178,255,.22);border-radius:9px;font-size:13px;background:rgba(10,18,38,.6);color:var(--text);font-family:inherit;}
+.cond-input:focus{outline:none;border-color:#4f8cff;box-shadow:0 0 0 2px rgba(79,140,255,.2);}
+.cond-input::placeholder{color:var(--dim);}
+.cond-tip{font-size:11px;color:var(--dim);padding:4px 0;line-height:1.5;}
+.cond-results{margin-top:13px;}
+.cond-result-row{display:flex;align-items:center;gap:4px;padding:8px 0;border-bottom:1px dashed rgba(148,178,255,.1);font-size:12px;flex-wrap:wrap;}
+.cond-result-row .mball{display:inline-flex;width:25px;height:25px;border-radius:50%;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;margin-right:2px;border:1px solid rgba(255,255,255,.2);}
+.cond-result-row .mball.r{background:radial-gradient(circle at 32% 28%,#f08b93,#d8404e 60%,#98232f);}
+.cond-result-row .mball.b{background:radial-gradient(circle at 32% 28%,#8cb2f5,#3568c9 60%,#24498f);}
+.cond-add{margin-left:auto;padding:5px 11px;font-size:11px;background:linear-gradient(135deg,rgba(79,140,255,.3),rgba(138,107,255,.25));color:#bcd8ff;border:1px solid rgba(120,170,255,.35);border-radius:8px;cursor:pointer;font-family:inherit;font-weight:600;}
+.cond-err{padding:13px;color:#ff8591;font-size:13px;text-align:center;background:rgba(255,93,108,.08);border-radius:10px;border:1px solid rgba(255,93,108,.25);}
+/* ===== 模型共识 ===== */
+.consensus-high{padding:8px 0;font-size:14px;color:var(--text);display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-weight:600;}
+.consensus-high .mball{
+  display:inline-flex;width:29px;height:29px;border-radius:50%;align-items:center;justify-content:center;
+  font-size:12px;font-weight:800;color:#fff;
+  background:radial-gradient(circle at 32% 28%,#ff8a93,#e04a58 60%,#a92a38);
+  box-shadow:0 2px 10px rgba(255,93,108,.5), inset 0 -2px 4px rgba(0,0,0,.25);
+}
+.consensus-bar{margin-top:9px;}
+.cbar-row{display:flex;align-items:center;gap:6px;padding:2px 0;font-size:11px;}
+.cbar-num{width:20px;text-align:right;font-weight:700;color:var(--sub);}
+.cbar-track{flex:1;height:14px;background:rgba(10,18,38,.7);border-radius:7px;overflow:hidden;border:1px solid rgba(148,178,255,.08);}
+.cbar-fill{height:100%;border-radius:7px;transition:width .3s;}
+.cbar-fill.hi{background:linear-gradient(90deg,#ff5d6c,#f0b24a);box-shadow:0 0 8px rgba(255,93,108,.4);}
+.cbar-fill.mid{background:linear-gradient(90deg,#f0b24a,#f5c86e);}
+.cbar-fill.lo{background:#33456b;}
+.cbar-cnt{width:32px;font-size:10px;color:var(--dim);}
+/* ===== 徽标/权重 ===== */
+.wtag{display:inline-block;margin-left:6px;padding:2px 7px;font-size:10px;color:#0d1730;background:linear-gradient(135deg,#f5c86e,#f0b24a);border-radius:8px;vertical-align:1px;font-weight:800;box-shadow:0 2px 6px rgba(240,178,74,.35);}
+.wtag:before{content:'★';margin-right:1px;}
+/* ===== Toast / 进度 / 下拉刷新 ===== */
+.toast{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);
+  background:rgba(14,24,48,.95);color:#fff;padding:11px 20px;border-radius:22px;font-size:12.5px;
+  z-index:999;box-shadow:0 6px 24px rgba(0,0,0,.5), inset 0 0 0 1px rgba(148,178,255,.2);
+  opacity:0;transition:opacity .3s;pointer-events:none;max-width:90%;text-align:center;
+  backdrop-filter:blur(10px);
+}
+.toast.show{opacity:1;}
+.toggle-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:13px;border-bottom:1px solid rgba(148,178,255,.08);}
+.toggle-row:last-child{border-bottom:none;}
+.toggle-row .lbl{color:var(--text);}
+.toggle-row .desc{font-size:11px;color:var(--sub);display:block;margin-top:2px;}
+.switch2{position:relative;width:46px;height:25px;background:#2a3a5e;border-radius:13px;cursor:pointer;transition:background .2s;flex-shrink:0;border:1px solid rgba(148,178,255,.2);}
+.switch2.on{background:linear-gradient(135deg,#4f8cff,#8a6bff);}
+.switch2::after{content:'';position:absolute;top:2px;left:2px;width:19px;height:19px;background:#fff;border-radius:50%;transition:left .2s;box-shadow:0 2px 6px rgba(0,0,0,.3);}
+.switch2.on::after{left:23px;}
+.pick.sync-hint{box-shadow:0 0 0 2px var(--gold) inset;}
+#pull-refresh{position:fixed;top:0;left:0;right:0;height:0;overflow:hidden;background:rgba(9,16,34,.95);backdrop-filter:blur(8px);transition:height .2s;z-index:999;display:flex;align-items:center;justify-content:center;font-size:12px;color:#7fb0ff;border-bottom:1px solid var(--line);}
+#pull-refresh .pr-arrow{display:inline-block;margin-right:6px;transition:transform .2s;}
+#sync-progress{position:fixed;top:0;left:0;height:3px;background:linear-gradient(90deg,#4f8cff,#8a6bff,#f0b24a);z-index:1000;transition:width .3s;width:0;box-shadow:0 0 10px rgba(79,140,255,.8);}
+.sync-status{font-size:11px;color:var(--sub);margin-top:2px;}
+.empty{color:var(--dim);font-size:13px;text-align:center;padding:22px 0;}
+.footer-note{
+  position:fixed;bottom:0;left:0;right:0;max-width:520px;margin:0 auto;
+  background:rgba(9,16,34,.92);backdrop-filter:blur(10px);
+  border-top:1px solid var(--line);padding:8px 12px;
+  font-size:11px;color:var(--dim);text-align:center;letter-spacing:.5px;
+}
+/* ===== 多彩文字体系 v12 ===== */
+.c-gold.c-gold{color:#ffc75a;font-weight:700;}
+.c-cyan.c-cyan{color:#4fd8f0;font-weight:700;}
+.c-blue.c-blue{color:#8ab4ff;font-weight:700;}
+.c-purple.c-purple{color:#c3a8ff;font-weight:700;}
+.c-green.c-green{color:#4ade80;font-weight:700;}
+.c-orange.c-orange{color:#ffb366;font-weight:700;}
+.c-pink.c-pink{color:#ff9ecf;font-weight:700;}
+.c-red.c-red{color:#ff7d8a;font-weight:700;}
+.c-dim2.c-dim2{color:#9db4de;font-weight:600;}
+.c-grad-gold.c-grad-gold{background:linear-gradient(135deg,#ffe29a,#f5b93f 55%,#f08a1e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;}
+.c-grad-blue.c-grad-blue{background:linear-gradient(135deg,#a8d0ff,#4f8cff);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;font-weight:800;}
+.mn-bayes.mn-bayes{color:#4fd8f0;font-weight:800;}
+.mn-markov.mn-markov{color:#7aa5f5;font-weight:800;}
+.mn-lstm.mn-lstm{color:#c3a8ff;font-weight:800;}
+.mn-stats.mn-stats{color:#4ade80;font-weight:800;}
+.mn-ai.mn-ai{color:#ffb366;font-weight:800;}
+.mn-fusion.mn-fusion{color:#ff9ecf;font-weight:800;}
+.mn-engine.mn-engine{color:#ffc75a;font-weight:800;}
+.mrow .mname{font-size:13.5px;}
+</style>
+</head>
+<body>
+<div id="sync-progress"></div><div id="pull-refresh" style="display:none;"><span class="pr-arrow">↓</span><span id="pr-text">下拉刷新</span></div>
+<div id="app">
+<header>
+  <div class="hd-mark">科</div>
+  <div class="hd-txt">
+    <h1>科创预测分析系统 <em class="engine">AI&nbsp;ENGINE</em></h1>
+    <div class="sub" id="hd-sub">加载中…</div>
+  </div>
+</header>
+<div id="upd-banner" style="display:none;background:rgba(240,178,74,.12);color:#f5c86e;font-size:12px;padding:7px 12px;text-align:center;border-bottom:1px solid rgba(240,178,74,.25);"><span id="upd-banner-text"></span><a style="margin-left:8px;color:#3b6fd4;text-decoration:none;" onclick="show('about')">去查看</a></div>
+<nav id="nav">
+  <button class="on" data-t="pred"><i>◈</i>预测推荐</button>
+  <button data-t="judge10"><i>◎</i>10维研判</button>
+  <button data-t="select"><i>✦</i>自主选号</button>
+  <button data-t="hist"><i>▣</i>历史开奖</button>
+  <button data-t="btverify"><i>◉</i>回测核验</button>
+  <button data-t="about"><i>⌬</i>关于</button>
+</nav>
+<main>
+  <section id="tab-pred" class="tab on"></section>
+  <section id="tab-judge10" class="tab"></section>
+  <section id="tab-fushi" class="tab"></section>
+  <section id="tab-select" class="tab"></section>
+  <section id="tab-hist" class="tab"></section>
+  <section id="tab-btverify" class="tab"></section>
+  <section id="tab-about" class="tab"></section>
+</main>
+<div class="footer-note">理性购彩 · 数据仅供研究参考</div>
+</div>
+
+<script>
+var DATA=null, G='dlt';
+var HAS_NATIVE_BRIDGE=(typeof AndroidBridge!=='undefined'&&AndroidBridge!==null);
+function $(id){return document.getElementById(id);}
+function fmtBalls(bs,cls){return (bs||[]).map(function(n){return '<span class="ball '+cls+'">'+n+'</span>';}).join('');}
+function fmtHBalls(bs,cls){return (bs||[]).map(function(n){return '<span class="hball '+cls+'">'+n+'</span>';}).join('');}
+function heatColor(v,max){var t=Math.max(0,Math.min(1,v/(max||1)));var r=Math.round(235-165*t),g=Math.round(215-110*t),b=Math.round(200-120*t);return 'rgb('+r+','+g+','+b+')';}
+
+var SEL={game:'dlt', play:'fu', front:[], back:[], danFront:[], danBack:[], extra:false, condMode:false, fushiView:false, cond:{must:'', ban:'', oddEven:'', backMust:'', backBan:'', z1:'', z2:'', z3:'', z4:'', l1:false, l2:false, l3:false, l4:false, noLian:false, genN:3}};
+function combo(n,k){if(k<0||k>n)return 0;k=Math.min(k,n-k);var r=1;for(var i=0;i<k;i++){r=r*(n-i)/(i+1);}return Math.round(r);}
+function pickN(max,n){var all=[];for(var i=1;i<=max;i++)all.push(i);for(var j=all.length-1;j>0;j--){var r=Math.floor(Math.random()*(j+1));var t=all[j];all[j]=all[r];all[r]=t;}return all.slice(0,n).sort(function(a,b){return a-b;});}
+function calcZhu(){
+  var dlt=SEL.game==='dlt';
+  var fNeed=dlt?5:6, bNeed=dlt?2:1;
+  if(SEL.play==='dan'){
+    var df=SEL.danFront.length, ft=SEL.front.length;
+    var db=SEL.danBack.length, bt=SEL.back.length;
+    if(!dlt){db=0;bt=SEL.back.length;}
+    if(df>=fNeed||db>=bNeed||df+ft<fNeed||db+bt<bNeed) return {z:0,msg:'胆码需少于基本数，胆+拖\u2265基本数'};
+    return {z:combo(ft,fNeed-df)*combo(bt,bNeed-db),msg:''};
+  }
+  var f=SEL.front.length,b=SEL.back.length;
+  if(f<fNeed||b<bNeed) return {z:0,msg:'未达基本数'};
+  return {z:combo(f,fNeed)*combo(b,bNeed),msg:''};
+}
+function resetSel(g){
+  SEL.game=g; SEL.play='fu'; SEL.front=[]; SEL.back=[]; SEL.danFront=[]; SEL.danBack=[]; SEL.extra=false; SEL.cond={must:'',ban:'',oddEven:'',backMust:'',backBan:'',z1:'',z2:'',z3:'',z4:'',l1:false,l2:false,l3:false,l4:false,noLian:false,genN:3};
+  renderSelect();
+}
+function renderFushi(){
+  var g=DATA.games[G], html='';
+  html+='<div class="switch">';
+  ['dlt','ssq'].forEach(function(k){html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderFushi();">'+DATA.games[k].meta.name+'</button>';});
+  html+='</div>';
+  var f=g.fushi;
+  if(!f||!f.plans||!f.plans.length){
+    html+='<div class="card"><div class="empty">暂无复式方案，请在电脑端运行 gen_fushi.py 生成后重新导出数据。</div></div>';
+    $('tab-select').innerHTML=html; return;
+  }
+  html+='<div class="card"><h2><span class="c-grad-gold">复式选号</span> <span class="tag">'+f.period+'期</span></h2>';
+  html+='<div class="note" style="font-size:12px;">自动组合容错覆盖，注数与金额已算。'+f.src+'。</div>';
+  f.plans.forEach(function(p){
+    var fballs=p.front.map(function(n){return '<span class="mball r">'+n+'</span>';}).join(' ');
+    var bballs=p.back.map(function(n){return '<span class="mball b">'+n+'</span>';}).join(' ');
+    html+='<div class="combo-group"><div class="combo-title"><span class="c-grad-gold">'+p.tag+'档</span> <span class="tag">'+p.zhu+'注 · <span class="c-green">'+p.cost+'元'+(p.cost3?'（追加<span class="c-orange">'+p.cost3+'元</span>）':'')+'</span></span></div>';
+    html+='<div style="font-size:13.5px;line-height:2;color:#eef3ff;font-weight:600;">前区：'+fballs+'<br/>后区：'+bballs+'</div>';
+    html+='</div>';
+  });
+  html+='</div>';
+  html+='<div class="sel-btns"><button class="sel-btn" onclick="SEL.fushiView=false;renderSelect();">返回自助选号</button></div>';
+  $('tab-select').innerHTML=html;
+}
+
+function renderSelect(){
+  if(SEL.fushiView){ renderFushi(); return; }
+  var g=DATA.games[SEL.game], m=g.meta;
+  var dlt=SEL.game==='dlt';
+  var frontMax=dlt?35:33, backMax=dlt?12:16;
+  var fNeed=dlt?5:6, bNeed=dlt?2:1;
+  var html='';
+  html+='<div class="switch">';
+  ['dlt','ssq'].forEach(function(k){html+='<button class="'+(k===SEL.game?'on':'')+'" onclick="resetSel(\''+k+'\')">'+DATA.games[k].meta.name+'</button>';});
+  html+='</div>';
+  html+='<div class="switch">';
+  [['fu','单式'],['fs','复式'],['dan','胆拖']].forEach(function(p){html+='<button class="'+(SEL.play===p[0]?'on':'')+'" onclick="SEL.play=\''+p[0]+'\';SEL.condMode=false;SEL.fushiView=false;renderSelect();">'+p[1]+'</button>';});
+  html+='<button class="'+(SEL.condMode?'on':'')+'" onclick="SEL.condMode=!SEL.condMode;SEL.fushiView=false;renderSelect();">条件选号</button>';
+  html+='</div>';
+  html+='<div class="card"><h2>'+m.name+' 自助选号 <span class="tag">'+(dlt?('前区'+fNeed+'·后区'+bNeed):('红球'+fNeed+'·蓝球'+bNeed))+'</span></h2>';
+  if(SEL.play==='dan'){
+    html+='<div class="pickline"><div class="lab">'+m.frontName+'胆</div><div class="pick-grid">';
+    for(var i=1;i<=frontMax;i++){html+='<div class="pick r'+(SEL.danFront.indexOf(i)>=0?' on':'')+'" onclick="toggleDan(\'danFront\','+i+','+fNeed+')">'+i+'</div>';}
+    html+='</div></div>';
+    html+='<div class="pickline"><div class="lab">'+m.frontName+'拖</div><div class="pick-grid">';
+    for(var i=1;i<=frontMax;i++){html+='<div class="pick r'+(SEL.front.indexOf(i)>=0?' on':'')+'" data-n="'+i+'" onclick="togglePick(\'front\','+i+')">'+i+'</div>';}
+    html+='</div></div>';
+    if(dlt){
+      html+='<div class="pickline"><div class="lab">'+m.backName+'胆</div><div class="pick-grid">';
+      for(var i=1;i<=backMax;i++){html+='<div class="pick b'+(SEL.danBack.indexOf(i)>=0?' on':'')+'" onclick="toggleDan(\'danBack\','+i+','+bNeed+')">'+i+'</div>';}
+      html+='</div></div>';
+    }
+    html+='<div class="pickline"><div class="lab">'+m.backName+(dlt?'拖':'')+'</div><div class="pick-grid">';
+    for(var i=1;i<=backMax;i++){html+='<div class="pick b'+(SEL.back.indexOf(i)>=0?' on':'')+'" data-n="'+i+'" onclick="togglePick(\'back\','+i+')">'+i+'</div>';}
+    html+='</div></div>';
+  } else if(!SEL.condMode){
+    html+='<div class="pickline"><div class="lab">'+m.frontName+'</div><div class="pick-grid">';
+    for(var i=1;i<=frontMax;i++){html+='<div class="pick r'+(SEL.front.indexOf(i)>=0?' on':'')+'" onclick="togglePick(\'front\','+i+')">'+i+'</div>';}
+    html+='</div></div>';
+    html+='<div class="pickline"><div class="lab">'+m.backName+'</div><div class="pick-grid">';
+    for(var i=1;i<=backMax;i++){html+='<div class="pick b'+(SEL.back.indexOf(i)>=0?' on':'')+'" data-n="'+i+'" onclick="togglePick(\'back\','+i+')">'+i+'</div>';}
+    html+='</div></div>';
+  }
+  var res=calcZhu(); var z=res.z;
+  var price=dlt?(SEL.extra?3:2):2;
+  if(dlt){
+    html+='<div class="fb-box" style="display:flex;align-items:center;gap:10px;padding:10px 12px;"><label style="font-size:13px;color:#dbe8ff;">追加投注（+1元/注，中浮动奖更多）</label><input type="checkbox" '+(SEL.extra?'checked':'')+' onchange="SEL.extra=this.checked;renderSelect();" style="width:20px;height:20px;flex-shrink:0;"></div>';
+  }
+  var df=SEL.danFront.length, ft=SEL.front.length, db=SEL.danBack.length, bt=SEL.back.length;
+  var shown=SEL.play==='dan'?('胆 '+df+'拖 '+ft+' · 胆 '+db+'拖 '+bt):(z>0?('选 '+SEL.front.length+'·'+SEL.back.length):res.msg);
+  html+='<div class="fb-box"><div class="fb-top"><span>已选</span><span>'+shown+'</span></div>';
+  if(SEL.play==='dan'){
+    html+='<div>'+m.frontName+': <b>胆['+(SEL.danFront.join(',')||'无')+'] 拖['+(SEL.front.join(',')||'无')+']</b></div>';
+    if(dlt){html+='<div>'+m.backName+': <b>胆['+(SEL.danBack.join(',')||'无')+'] 拖['+(SEL.back.join(',')||'无')+']</b></div>';}
+    else{html+='<div>'+m.backName+': <b>'+(SEL.back.join(',')||'未选')+'</b></div>';}
+  } else {
+    html+='<div>'+m.frontName+': <b>'+(SEL.front.join(',')||'未选')+'</b></div>';
+    html+='<div>'+m.backName+': <b>'+(SEL.back.join(',')||'未选')+'</b></div>';
+  }
+  html+='<div>注数: <b class="c-cyan">'+z+'</b> 注 · 金额 <b class="c-green">'+(z*price)+'</b> 元'+(dlt&&SEL.extra?'（<span class="c-orange">含追加</span>）':'')+'</div></div>';
+  html+='<div class="sel-btns">';
+  html+='<button class="sel-btn p" onclick="randomPick()">随机一注</button>';
+  html+='<button class="sel-btn" onclick="resetSel(\''+SEL.game+'\')">清空</button>';
+  html+='</div>';
+  html+='<div class="note" style="font-size:12px;">单式=基本数1注；复式=超出自动算注；胆拖=胆码+拖码组合自动算注。理性购彩。</div>';
+  // ===== 自设条件选号面板（升级版12项条件）=====
+  if(SEL.condMode){
+    html+='<div class="card"><h2>自设条件选号 <span class="tag">12项智能筛选</span></h2>';
+    html+='<div class="cond-form">';
+    // --- 前区条件 ---
+    html+='<div class="cond-group"><div class="cond-group-title">前区条件</div>';
+    html+='<div class="cond-row"><label>必含</label><input type="text" class="cond-input" placeholder="如: 2,6 或 带2" value="'+SEL.cond.must+'" onchange="SEL.cond.must=this.value;"></div>';
+    html+='<div class="cond-row"><label>排除</label><input type="text" class="cond-input" placeholder="如: 5,15,25" value="'+SEL.cond.ban+'" onchange="SEL.cond.ban=this.value;"></div>';
+    html+='<div class="cond-row"><label>奇偶比</label><select class="cond-input" onchange="SEL.cond.oddEven=this.value;"><option value="">不限</option>';
+    var oeOpts=dlt?['3:2','2:3','4:1','1:4','5:0','0:5']:['3:3','4:2','2:4','5:1','1:5','6:0','0:6'];
+    oeOpts.forEach(function(o){html+='<option value="'+o+'"'+(SEL.cond.oddEven===o?' selected':'')+'>'+o+'</option>';});
+    html+='</select></div></div>';
+    // --- 后区条件 ---
+    html+='<div class="cond-group"><div class="cond-group-title">后区条件</div>';
+    html+='<div class="cond-row"><label>必含</label><input type="text" class="cond-input" placeholder="如: 3,7" value="'+SEL.cond.backMust+'" onchange="SEL.cond.backMust=this.value;"></div>';
+    html+='<div class="cond-row"><label>排除</label><input type="text" class="cond-input" placeholder="如: 1,2" value="'+SEL.cond.backBan+'" onchange="SEL.cond.backBan=this.value;"></div></div>';
+    // --- 区间个数 ---
+    html+='<div class="cond-group"><div class="cond-group-title">区间个数（前区）</div>';
+    var zones=[['z1','1-10'],['z2','11-20'],['z3','21-30'],['z4','31以上']];
+    zones.forEach(function(z){
+      var cur = SEL.cond[z[0]] ? String(SEL.cond[z[0]]).split(',').filter(function(x){return x!=='';}) : [];
+      html+='<div class="cond-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><label style="width:auto;">'+z[1]+'（点选允许多个）</label><div style="display:flex;flex-wrap:wrap;gap:4px;">';
+      for(var zi=0;zi<=5;zi++){
+        var on = cur.indexOf(String(zi))>=0;
+        html+='<button type="button" onclick="toggleZonePick(\''+z[0]+'\','+zi+')" style="min-width:34px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid '+ (on?'#4fd8f0':'#3a4a6a') +';background:'+(on?'rgba(79,216,240,0.25)':'transparent')+';color:'+(on?'#4fd8f0':'#8fa8d8')+';">'+zi+'</button>';
+      }
+      html+='</div></div>';
+    });
+    html+='</div>';
+    // --- 连号条件 ---
+    html+='<div class="cond-group"><div class="cond-group-title">连号条件（前区，至少1组2连）</div>';
+    html+='<div class="cond-row" style="flex-wrap:wrap;">';
+    var lians=[['l1','1-10连号'],['l2','11-20连号'],['l3','21-30连号'],['l4','31以上连号']];
+    lians.forEach(function(l){
+      html+='<label style="display:flex;align-items:center;gap:4px;font-size:12px;width:48%;"><input type="checkbox" '+(SEL.cond[l[0]]?'checked':'')+' onchange="SEL.cond.'+l[0]+'=this.checked;" style="width:16px;height:16px;">'+l[1]+'</label>';
+    });
+    html+='<label style="display:flex;align-items:center;gap:4px;font-size:12px;width:100%;margin-top:4px;color:#d32f2f;"><input type="checkbox" '+(SEL.cond.noLian?'checked':'')+' onchange="SEL.cond.noLian=this.checked;" style="width:16px;height:16px;">全局无连号（前区不含任何相邻号码）</label>';
+    html+='</div></div>';
+    // --- 生成注数 ---
+    html+='<div class="cond-group"><div class="cond-group-title">生成设置</div>';
+    html+='<div class="cond-row"><label>生成注数</label><select class="cond-input" onchange="SEL.cond.genN=parseInt(this.value);">';
+    [1,2,3,5].forEach(function(nn){html+='<option value="'+nn+'"'+(SEL.cond.genN===nn?' selected':'')+'>'+nn+'注</option>';});
+    html+='</select></div></div>';
+    html+='</div>';
+    html+='<div class="cond-tip">必含：数字列表(2,6)或带X(2,12,22,32)；区间个数精确控制；勾选连号则该区必含2连号</div>';
+    html+='<button class="sel-btn p" style="width:100%;margin-top:8px;" onclick="genByCondition()">根据条件生成号码</button>';
+    html+='<div id="cond-result"></div>';
+    html+='</div>';
+  }
+  $('tab-select').innerHTML=html;
+}
+// ===== 自设条件选号：条件解析 + 号码生成 =====
+function parseNumList(str, max){
+  if(!str) return [];
+  // v7.2: 支持数组输入
+  if(Array.isArray(str)){ return str.filter(function(x){ var v=parseInt(x); return !isNaN(v)&&v>=1&&v<=max; }).map(Number); }
+  str = String(str).trim();
+  var nums = [];
+  if(str.indexOf('带') === 0){
+    var d = parseInt(str.replace('带',''));
+    for(var i=1;i<=max;i++){ if((i%10)===d) nums.push(i); }
+  } else {
+    // 支持中英文逗号、顿号、空格、分号、点号、竖线等多种分隔符
+    str.split(/[,，、；;\s\.\|]+/).forEach(function(x){ var v=parseInt(x); if(!isNaN(v)&&v>=1&&v<=max) nums.push(v); });
+  }
+  return nums;
+}
+function parseBackCond(str, max){
+  if(!str) return {type:'any', vals:[]};
+  str = str.trim();
+  if(str.indexOf('>=')===0) return {type:'gte', val:parseInt(str.substr(2))};
+  if(str.indexOf('<=')===0) return {type:'lte', val:parseInt(str.substr(2))};
+  if(str.indexOf('>')===0) return {type:'gt', val:parseInt(str.substr(1))};
+  if(str.indexOf('<')===0) return {type:'lt', val:parseInt(str.substr(1))};
+  return {type:'in', vals:parseNumList(str, max)};
+}
+function checkBackCond(balls, cond){
+  if(cond.type==='any') return true;
+  if(cond.type==='gt') return balls.every(function(b){return b>cond.val;});
+  if(cond.type==='lt') return balls.every(function(b){return b<cond.val;});
+  if(cond.type==='gte') return balls.every(function(b){return b>=cond.val;});
+  if(cond.type==='lte') return balls.every(function(b){return b<=cond.val;});
+  if(cond.type==='in') return cond.vals.every(function(v){return balls.indexOf(v)>=0;});
+  return true;
+}
+function toggleZonePick(key, n){
+  var cur = SEL.cond[key] ? String(SEL.cond[key]).split(',').filter(function(x){return x!=='';}) : [];
+  var s = String(n);
+  var idx = cur.indexOf(s);
+  if(idx>=0) cur.splice(idx,1); else cur.push(s);
+  SEL.cond[key] = cur.join(',');
+  renderSelect();
+}
+function genByCondition(){
+  var g=DATA.games[SEL.game];
+  var dlt=SEL.game==='dlt';
+  var frontMax=dlt?35:33, backMax=dlt?12:16;
+  var fNeed=dlt?5:6, bNeed=dlt?2:1;
+  var c=SEL.cond;
+  // 解析前区条件
+  var mustNums = parseNumList(c.must, frontMax);
+  var banNums = parseNumList(c.ban, frontMax);
+  var oddEven = c.oddEven ? c.oddEven.split(':').map(Number) : null;
+  // 解析后区条件
+  var backMust = parseNumList(c.backMust, backMax);
+  var backBan = parseNumList(c.backBan, backMax);
+  // 区间个数
+  var zAllow = [c.z1?String(c.z1).split(',').map(Number):[], c.z2?String(c.z2).split(',').map(Number):[], c.z3?String(c.z3).split(',').map(Number):[], c.z4?String(c.z4).split(',').map(Number):[]];
+  // 连号条件
+  var lianReq = [c.l1, c.l2, c.l3, c.l4];
+  // 候选池
+  var pool = {};
+  g.predictions.items.forEach(function(it){ (it.front||[]).forEach(function(n){pool[n]=(pool[n]||0)+1;}); });
+  var hist = g.history||[];
+  if(hist.length>0){ hist.slice(-50).forEach(function(row){ (row.front||[]).forEach(function(n){pool[n]=(pool[n]||0)+0.3;}); }); }
+  var candidates = Object.keys(pool).map(Number).filter(function(n){return banNums.indexOf(n)<0;})
+    .sort(function(a,b){return (pool[b]-pool[a])||(a-b);});
+  // 候选池补充：若某些区间无候选号，从全部号码（排除排除号）中补充，避免区间条件无法满足
+  var allNums=[]; for(var _ai=1;_ai<=frontMax;_ai++){if(banNums.indexOf(_ai)<0)allNums.push(_ai);}
+  var missingZone=[false,false,false,false];
+  candidates.forEach(function(n){var z=n<=10?0:(n<=20?1:(n<=30?2:3));missingZone[z]=true;});
+  for(var _zi=0;_zi<4;_zi++){
+    if(!missingZone[_zi]){
+      var zoneNums=allNums.filter(function(n){return (_zi===0&&n<=10)||(_zi===1&&n>10&&n<=20)||(_zi===2&&n>20&&n<=30)||(_zi===3&&n>30);});
+      candidates=candidates.concat(zoneNums);
+    }
+  }
+  var mustValid = mustNums.filter(function(n){return banNums.indexOf(n)<0;});
+  if(mustValid.length > fNeed){
+    document.getElementById('cond-result').innerHTML='<div class="cond-err">必含号码超过'+fNeed+'个，请减少</div>'; return;
+  }
+  // 区间个数总和检查
+  var zSum = zAllow.reduce(function(a,arr){return a + (arr.length?Math.min.apply(null,arr):0);},0);
+  if(zSum > fNeed){
+    document.getElementById('cond-result').innerHTML='<div class="cond-err">区间个数总和超过'+fNeed+'个，请调整</div>'; return;
+  }
+  // 后区必含检查
+  if(backMust.length > bNeed){
+    document.getElementById('cond-result').innerHTML='<div class="cond-err">后区必含超过'+bNeed+'个，请减少</div>'; return;
+  }
+  // 辅助函数：判断区间
+  function zoneOf(n){ if(n<=10)return 0; if(n<=20)return 1; if(n<=30)return 2; return 3; }
+  // 辅助函数：判断某区间是否有连号
+  function hasLianInZone(nums, zi){
+    var zNums = nums.filter(function(n){return zoneOf(n)===zi;}).sort(function(a,b){return a-b;});
+    for(var i=0;i<zNums.length-1;i++){ if(zNums[i+1]-zNums[i]===1) return true; }
+    return false;
+  }
+  // 生成号码
+  var results = [], tried = {}, maxTry = 1000, genN = c.genN||3;
+  for(var t=0;t<maxTry && results.length<genN;t++){
+    // 前区：必含号 + 候选池
+    var front = mustValid.slice();
+    var pool2 = candidates.filter(function(n){return front.indexOf(n)<0;});
+    for(var i=pool2.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var tmp=pool2[i];pool2[i]=pool2[j];pool2[j]=tmp;}
+    var topN = Math.min(pool2.length, Math.max(12, fNeed*3));
+    var topPool = pool2.slice(0, topN);
+    while(front.length < fNeed && topPool.length>0){
+      front.push(topPool.splice(Math.floor(Math.random()*topPool.length),1)[0]);
+    }
+    if(front.length < fNeed) continue;
+    front.sort(function(a,b){return a-b;});
+    // 奇偶比检查
+    if(oddEven){
+      var odd = front.filter(function(x){return x%2===1;}).length;
+      if(odd !== oddEven[0]) continue;
+    }
+    // 区间个数检查
+    var zActual = [0,0,0,0];
+    front.forEach(function(n){ zActual[zoneOf(n)]++; });
+    var zOk = true;
+    for(var zi=0;zi<4;zi++){ if(zAllow[zi].length>0 && zAllow[zi].indexOf(zActual[zi])<0){ zOk=false; break; } }
+    if(!zOk) continue;
+    // 连号检查
+    var lOk = true;
+    for(var li=0;li<4;li++){ if(lianReq[li] && !hasLianInZone(front, li)){ lOk=false; break; } }
+    if(!lOk) continue;
+    // 全局无连号检查
+    if(c.noLian){
+      var sortedF=front.slice().sort(function(a,b){return a-b;});
+      var hasAnyLian=false;
+      for(var _li=0;_li<sortedF.length-1;_li++){ if(sortedF[_li+1]-sortedF[_li]===1){ hasAnyLian=true; break; } }
+      if(hasAnyLian) continue;
+    }
+    // 后区：必含 + 候选
+    var back = backMust.slice();
+    var backCands = [];
+    for(var b=1;b<=backMax;b++){
+      if(backBan.indexOf(b)>=0) continue;
+      if(back.indexOf(b)>=0) continue;
+      backCands.push(b);
+    }
+    while(back.length<bNeed && backCands.length>0){
+      back.push(backCands.splice(Math.floor(Math.random()*backCands.length),1)[0]);
+    }
+    if(back.length < bNeed) continue;
+    back.sort(function(a,b){return a-b;});
+    var key = front.join(',')+'+'+back.join(',');
+    if(tried[key]) continue;
+    tried[key]=true;
+    results.push({front:front, back:back});
+  }
+  // 展示结果
+  var html='';
+  if(results.length===0){
+    html='<div class="cond-err">未找到符合条件的号码组合，请放宽条件（检查区间个数/连号/必含是否冲突）</div>';
+  } else {
+    html='<div class="cond-results">';
+    results.forEach(function(r, idx){
+      var fBalls=r.front.map(function(n){return '<span class="mball r">'+n+'</span>';}).join('');
+      var bBalls=r.back.map(function(n){return '<span class="mball b">'+n+'</span>';}).join('');
+      html+='<div class="cond-result-row"><span class="cno">'+(idx+1)+'</span>'+fBalls+'<span class="cplus">+</span>'+bBalls;
+      html+='<button class="cond-add" onclick="addCondToSel('+idx+')">加入选号</button></div>';
+    });
+    html+='</div>';
+    window._condResults = results;
+  }
+  document.getElementById('cond-result').innerHTML=html;
+}
+function addCondToSel(idx){
+  var r = window._condResults[idx];
+  if(!r) return;
+  SEL.front = r.front.slice();
+  SEL.back = r.back.slice();
+  SEL.play = 'fu';
+  SEL.condMode = false;
+  renderSelect();
+  showToast('已加入选号栏');
+}
+function togglePick(zone,n){
+  var arr=SEL[zone]; var idx=arr.indexOf(n);
+  if(idx>=0)arr.splice(idx,1); else arr.push(n);
+  // 局部刷新：只更新被点球的样式 + 已选摘要，不重绘整个网格（避免闪烁+保持滚动位置）
+  var el=document.querySelector('.pick.'+(zone==='front'?'r':'b')+'[data-n="'+n+'"]');
+  if(el){ el.classList.toggle('on'); }
+  else { renderSelect(); return; }  // 兼容旧渲染
+  updateSelSummary();
+}
+function updateSelSummary(){
+  // 只更新"已选"摘要区域，不重绘号码网格
+  var dlt=SEL.game==='dlt';
+  var res=calcZhu(); var z=res.z;
+  var price=dlt?(SEL.extra?3:2):2;
+  var df=SEL.danFront.length, ft=SEL.front.length, db=SEL.danBack.length, bt=SEL.back.length;
+  var shown=SEL.play==='dan'?('胆 '+df+'拖 '+ft+' · 胆 '+db+'拖 '+bt):(z>0?('选 '+SEL.front.length+'·'+SEL.back.length):res.msg);
+  var box=document.querySelector('.fb-box');
+  if(box){
+    var m=SEL.game==='dlt'?{frontName:'前区',backName:'后区'}:{frontName:'红球',backName:'蓝球'};
+    var html='<div class="fb-top"><span>已选</span><span>'+shown+'</span></div>';
+    if(SEL.play==='dan'){
+      html+='<div>'+m.frontName+': <b>胆['+(SEL.danFront.join(',')||'无')+'] 拖['+(SEL.front.join(',')||'无')+']</b></div>';
+      if(dlt){html+='<div>'+m.backName+': <b>胆['+(SEL.danBack.join(',')||'无')+'] 拖['+(SEL.back.join(',')||'无')+']</b></div>';}
+      else{html+='<div>'+m.backName+': <b>'+(SEL.back.join(',')||'未选')+'</b></div>';}
+    } else {
+      html+='<div>'+m.frontName+': <b>'+(SEL.front.join(',')||'未选')+'</b></div>';
+      html+='<div>'+m.backName+': <b>'+(SEL.back.join(',')||'未选')+'</b></div>';
+    }
+    html+='<div>注数: <b>'+z+'</b> 注 · 金额 <b>'+(z*price)+'</b> 元'+(dlt&&SEL.extra?'（含追加）':'')+'</div>';
+    box.innerHTML=html;
+  }
+}
+function toggleDan(zone,n,max){
+  var arr=SEL[zone]; var idx=arr.indexOf(n);
+  if(idx>=0)arr.splice(idx,1); else { if(arr.length>=max-1)return; arr.push(n); }
+  renderSelect();
+}
+function randomPick(){
+  var dlt=SEL.game==='dlt';
+  var frontMax=dlt?35:33, backMax=dlt?12:16;
+  var fNeed=dlt?5:6, bNeed=dlt?2:1;
+  SEL.play='fu'; SEL.danFront=[]; SEL.danBack=[];
+  SEL.front=pickN(frontMax,fNeed); SEL.back=pickN(backMax,bNeed);
+  renderSelect();
+}
+function syncNow(){
+  var input=document.getElementById('cfg-remote');
+  if(input){ var c=loadCfg(); c.remoteBase=input.value.trim(); saveCfg(c); }
+  var cfg=loadCfg();
+  var el=document.getElementById('upd-msg');
+  if(!cfg.remoteBase){ if(el)el.textContent='请先在上方输入服务器地址（如 http://192.168.101.101:8000）'; return; }
+  if(el)el.textContent='正在从服务器拉取最新数据...（约3-10秒，请稍候）';
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 8000)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+      cfg.lastSync=d.generated||''; cfg.lastSyncSource='remote'; saveCfg(cfg);
+      DATA=d;
+      try{ renderPred(); renderSelect(); renderHist(); renderFushi(); renderBt(); renderVerify(); renderAbout(); }catch(e){ try{console.error('render err',e);}catch(_e){} }
+      if(el)el.textContent='\u2713 数据同步成功！最新数据时间：'+(d.generated||'未知')+'，预测期号：'+(d.games.dlt.predictions.period||'')+' / '+(d.games.ssq.predictions.period||'');
+      if(el)el.style.color='#2e7d32';
+      showToast('\u2713 数据已刷新');
+    })
+    .catch(function(e){
+      if(el)el.textContent='\u2717 同步失败：无法连接服务器（'+e.message+'）。请检查：①手机和电脑同一WiFi ②电脑IP是否正确 ③防火墙是否放行8000端口';
+      if(el)el.style.color='#c62828';
+    });
+}
+function checkUpdate(){
+  var u=DATA.update||{};
+  var el=document.getElementById('upd-msg');
+  checkRemoteVersion().then(function(v){
+    if(!v){ if(el)el.textContent='当前为内置版本 '+u.currentVersion+'。未配置联网同步或无法连接服务器，功能升级需重装最新APK（数据可离线使用）。'; return; }
+    if(v.version&&v.version!==u.currentVersion){ if(el)el.textContent='\u2713 发现新版本 '+v.version+'（当前 '+u.currentVersion+'）！数据已自动同步；如需新版功能请重装APK或刷新PWA。'; }
+    else{ if(el)el.textContent='\u2713 当前已是最新版本 '+u.currentVersion+'，联网数据已同步。每日21:45自动生成新版。'; }
+  });
+}
+
+function triggerRealtimeUpdate(){
+  var cfg=loadCfg();
+  if(!cfg.remoteBase){ alert('请先配置远程服务器地址'); return; }
+  var token=prompt('请输入更新令牌（默认 kcyc2026）：','kcyc2026');
+  if(!token) return;
+  var msg=document.getElementById('rt-msg');
+  if(msg)msg.textContent='正在提交更新请求...';
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/update?token='+encodeURIComponent(token)+'&game=all', 15000, {method:'POST'})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.status==='started'){ if(msg){msg.textContent='✓ 已提交电脑端更新，自动等待完成（约5-6分钟，期间无需操作）...'; msg.style.color='#c8891f';} pollUpdateStatus(msg, 0); }
+      else if(d.status==='busy'){ if(msg)msg.textContent='电脑端更新正在进行中，自动等待完成...'; pollUpdateStatus(msg, 0); }
+      else { if(msg){msg.textContent=(d.msg||d.status); msg.style.color='#c62828';} }
+    })
+    .catch(function(e){ if(msg){msg.textContent='✗ 更新触发失败：无法连接服务器（'+e.message+'）。请检查手机与电脑是否同一WiFi'; msg.style.color='#c62828';} });
+}
+function pollUpdateStatus(msg, tick){
+  if(tick>60){ if(msg)msg.textContent='已持续等待约8分钟，可再点一次"更新状态"查询'; return; }
+  var cfg=loadCfg();
+  if(!cfg.remoteBase) return;
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/update/status', 8000)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.running){ if(msg)msg.textContent='更新进行中...（已自动等待约'+Math.round((tick+1)*8/60*10)/10+'分钟，电脑端预计共需5-6分钟）'; setTimeout(function(){ pollUpdateStatus(msg, tick+1); }, 8000); }
+      else if(d.result){
+        if(d.result.status==='done'){ if(msg){msg.textContent='✓ 更新完成！耗时'+d.result.elapsed+'秒（'+d.result.time+'），正在自动拉取最新数据...'; msg.style.color='#2e7d32';} syncNowSilent(); }
+        else { if(msg){msg.textContent='更新未成功：'+(d.result.msg||d.result.status); msg.style.color='#c62828';} }
+      }
+      else { if(msg)msg.textContent='暂无更新记录，请确认电脑端服务器已运行'; }
+    })
+    .catch(function(){ if(msg){msg.textContent='✗ 无法连接服务器查询状态，请检查电脑IP与WiFi'; msg.style.color='#c62828';} });
+}
+function syncNowSilent(){
+  var cfg=loadCfg();
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 10000)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(d){
+      try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+      cfg.lastSync=d.generated||''; cfg.lastSyncSource='remote'; saveCfg(cfg);
+      DATA=d; renderPred(); renderSelect(); renderHist(); renderFushi(); renderBt(); renderVerify(); renderAbout();
+      var msg=document.getElementById('rt-msg');
+      if(msg){ msg.textContent='✓ 数据已自动刷新！最新数据时间：'+(d.generated||'未知'); msg.style.color='#2e7d32'; }
+      showToast('✓ 数据已刷新');
+    })
+    .catch(function(e){ var msg=document.getElementById('rt-msg'); if(msg){ msg.textContent='✗ 更新完成但数据拉取失败：'+e.message+'（可点"立即同步数据"重试）'; msg.style.color='#c62828'; } });
+}
+function checkUpdateStatus(){
+  var cfg=loadCfg();
+  if(!cfg.remoteBase){ alert('请先配置远程服务器地址'); return; }
+  var msg=document.getElementById('rt-msg');
+  if(msg)msg.textContent='正在查询更新状态...';
+  pollUpdateStatus(msg, 0);
+}
+
+function renderPatternCard(g){
+  var pat=g.pattern; if(!pat) return '';
+  var body='';
+  // 区间流向
+  var zt=pat['区间占比']&&pat['区间占比']['前区流向']?pat['区间占比']['前区流向']:[];
+  if(zt.length){
+    body+='<div style="font-size:12px;color:var(--sub);margin-bottom:4px;">区间流向（近5期 vs 全部）</div>';
+    body+='<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px;">';
+    zt.forEach(function(z){
+      var c=z.trend==='上升'?'#e0484f':(z.trend==='下降'?'#3b6fd4':'#999');
+      body+='<span style="font-size:11px;background:#f7f9fc;padding:3px 8px;border-radius:6px;color:'+c+';">'+z.zone+' '+z.recent+'% ('+z.trend+')</span>';
+    });
+    body+='</div>';
+  }
+  // 大小号+连号+同号
+  var bs=pat['大小号']?pat['大小号']['分布TOP3']:[];
+  var lh=pat['连号']||{};
+  var sf=pat['前后区同号']||{};
+  body+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:11px;">';
+  if(bs.length) body+='<div class="meta-item">高频大小号<b>'+bs[0][0]+'</b></div>';
+  if(lh['近50期有连号概率%']!==undefined) body+='<div class="meta-item">连号概率<b>'+lh['近50期有连号概率%']+'%</b></div>';
+  if(sf['近50期概率%']!==undefined) body+='<div class="meta-item">前后区同号<b>'+sf['近50期概率%']+'%</b></div>';
+  if(pat['和值跨度']) body+='<div class="meta-item">近20期和值<b>'+pat['和值跨度']['近20期和值均值']+'</b></div>';
+  body+='</div>';
+  // 热号冷号
+  var hot=pat['冷热']?pat['冷热']['近10期热号前区']:[];
+  var cold=pat['冷热']?pat['冷热']['近10期冷号前区']:[];
+  if(hot.length){
+    body+='<div style="margin-top:8px;font-size:11px;color:var(--sub);">近10期热号：';
+    hot.forEach(function(h){body+='<span style="display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;background:#e0484f;color:#fff;border-radius:50%;font-size:10px;font-weight:600;margin:0 2px;">'+h[0]+'</span>';});
+    body+='</div>';
+  }
+  if(cold.length){
+    body+='<div style="margin-top:4px;font-size:11px;color:var(--sub);">近10期冷号：';
+    cold.forEach(function(h){body+='<span style="display:inline-block;min-width:22px;height:22px;line-height:22px;text-align:center;background:#999;color:#fff;border-radius:50%;font-size:10px;font-weight:600;margin:0 2px;">'+h[0]+'</span>';});
+    body+='</div>';
+  }
+  body+='';
+  return foldCard('pred_pattern', '规律分析<span class="tag">'+pat.n_analyzed+'期</span>', body, false);
+}
+
+// v1.6.0 全量历史规律扫描卡片（全部历史开奖跑一遍发现的新规律）
+function renderFullScan(g){
+  var fs=(DATA.full_scan||{})[g];
+  if(!fs||!fs.n_periods) return '';
+  var body='';
+  body+='<div class="note" style="line-height:1.55;margin-bottom:6px;">全量 <b class="c-gold">'+fs.n_periods+'期</b>（'+fs.first+'→'+fs.last+'）18类维度规律扫描，统计概率供参考。</div>';
+  var fds=fs.findings||[];
+  if(fds.length){
+    body+='<div style="font-size:11.5px;margin:6px 0;"><span class="c-gold">新发现规律（'+fds.length+'条）：</span></div>';
+    fds.forEach(function(fd,i){
+      body+='<div style="font-size:11px;color:#c9d8f5;padding:3px 0;line-height:1.5;">'+(i+1)+'. <b>'+fd.rule+'</b>：'+fd.evidence+' <span style="color:'+(fd.显著性==='极显著'?'#e0484f':(fd.显著性==='显著'?'#ffb366':'#8fa8d8'))+';font-size:10px;">['+(fd.显著性||'参考')+']</span></div>';
+    });
+  }
+  var sg=fs.signals||{};
+  if(sg.sum_bias){
+    body+='<div style="font-size:11px;margin-top:6px;color:var(--sub);line-height:1.6;">';
+    body+='<div>· 和值趋势：'+sg.sum_bias+'</div>';
+    body+='<div>· 奇偶主导：'+sg.odd_bias+'</div>';
+    body+='<div>· 连号形态：'+sg.seq_bias+'</div>';
+    if(sg.hot&&sg.hot.length) body+='<div>· 全量热号：'+sg.hot.join(',')+'</div>';
+    if(sg.back_hot&&sg.back_hot.length) body+='<div>· 后区热号：'+sg.back_hot.join(',')+'</div>';
+    body+='</div>';
+  }
+  var dl=fs.dims_light||{};
+  if(dl['和值']&&dl['和值'].均值){
+    body+='<div style="font-size:11px;margin-top:6px;color:var(--sub);line-height:1.6;">';
+    body+='<div>· 和值均值：全量 '+dl['和值'].均值+' vs 近100期 '+dl['和值']['近100期均值']+'</div>';
+    if(dl['区间分布']&&dl['区间分布']['近100期Top形态']){
+      body+='<div>· 区间形态：全量 ['+(dl['区间分布']['全量Top形态']||[]).join(',')+'] → 近100期 ['+(dl['区间分布']['近100期Top形态']||[]).join(',')+']</div>';
+    }
+    if(dl['连号']&&dl['连号']['全量对数分布%']){
+      body+='<div>· 有连号概率：'+(100-(dl['连号']['全量对数分布%']['0']||0)).toFixed(1)+'%（全量）</div>';
+    }
+    body+='</div>';
+  }
+  body+='<div style="font-size:10.5px;color:#5c6f99;margin-top:6px;">扫描时间：'+fs.scanned_at+' ｜ 完整报告：系统根目录 full_scan_report_'+g+'.md</div>';
+  html+=foldCard('pred_fullscan', '全量历史扫描<span class="tag">'+fs.n_periods+'期 · 18类维度</span>', body, false);
+  return html;
+}
+
+function renderExternalReview(g){
+  var rv=(DATA.review||{})[g];
+  if(!rv) return '';
+  var fb=rv.feedback||{}, pk=rv.pack||{};
+  var srcs=fb.sources||{};
+  var overall=pk.overall_weight||0;
+  var html='';
+  var body='';
+  body+='<div class="note" style="line-height:1.55;margin-bottom:8px;">三大综合算法外部智囊团：研判数据包→外部模型回填→自动解析融合（当前权重 <b class="c-gold">'+Math.round(overall*100)+'%</b>），每期开奖后自动评估各方命中。</div>';
+  // 各方命中与权重
+  var sNames={'doubao':'豆包(内置AI引擎)','deepseek':'DeepSeek','chatgpt':'ChatGPT'};
+  var keys=Object.keys(srcs);
+  if(keys.length){
+    body+='<div style="font-size:11.5px;margin-bottom:6px;">';
+    keys.forEach(function(s){
+      var src=srcs[s];
+      var rate=src.recent_hit_rate!==undefined?(Math.round(src.recent_hit_rate*100)+'%'):'—';
+      var w=src.weight!==undefined?src.weight.toFixed(2):'0.15';
+      body+='<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px dashed rgba(148,178,255,.12);">';
+      body+='<span style="min-width:110px;color:#c9d8f5;">'+(sNames[s]||s)+'</span>';
+      body+='<span style="min-width:70px;color:#8fa8d8;font-size:10.5px;">近5期命中 '+rate+'</span>';
+      body+='<span style="min-width:44px;font-weight:600;color:'+(w>0.15?'#7ee0a3':(w<0.15?'#ffb366':'#c9d8f5'))+';" title="外部研判权重（动态，0.10~0.25）">权重 '+w+'</span>';
+      if(!src.total) body+='<span style="color:#666;font-size:10px;">未接入(需Key)</span>';
+      body+='</div>';
+    });
+    body+='</div>';
+  }
+  // 融合共识信号
+  var fu=pk.fusion||{};
+  if(fu.consensus&&fu.consensus.length){
+    body+='<div style="font-size:11.5px;margin:6px 0;"><span class="c-gold">三方共识研判：</span>';
+    fu.consensus.forEach(function(c){
+      body+='<span style="display:inline-block;background:rgba(255,215,74,.12);border:1px solid rgba(255,215,74,.35);color:#ffd54a;padding:2px 8px;border-radius:10px;font-size:10.5px;margin:2px;">'+c.dim+'→'+c.value+'</span>';
+    });
+    body+='</div>';
+  }
+  // 每期技术纠偏建议
+  var adv=fb.advice||[];
+  if(adv.length){
+    body+='<div style="font-size:11.5px;margin-top:6px;"><span style="color:#7ee0a3;font-weight:600;">本期技术纠偏：</span></div>';
+    adv.forEach(function(a){
+      body+='<div style="font-size:11px;color:#ffb366;padding:2px 0;line-height:1.5;">→ '+a+'</div>';
+    });
+  }
+  // 生成研判数据包按钮
+  body+='<div class="sel-btns" style="margin-top:8px;">';
+  body+='<button class="sel-btn p" onclick="genReviewPack()" style="flex:1;"><span style="font-size:14px;">🧠</span> 生成研判数据包</button>';
+  body+='</div>';
+  body+='<div id="rv-msg" class="note" style="margin-top:6px;"></div>';
+  // v1.6.5 豆包AI独立研判 + 三源共识融合（系统引擎/DeepSeek/豆包AI）
+  var tl=(DATA.triple_llm_review||{})[g];
+  var dbv=(DATA.doubao_review||{})[g];
+  if(tl){
+    body+='<div style="border:1px solid rgba(126,224,163,.25);background:rgba(126,224,163,.06);border-radius:10px;padding:8px;margin-top:8px;">';
+    body+='<div style="font-size:12px;font-weight:600;color:#7ee0a3;margin-bottom:6px;">🧬 三源共识融合（系统引擎 / DeepSeek / 豆包AI）<span class="tag">'+(tl.period||'')+'期</span></div>';
+    if(tl.conclusion){
+      body+='<div style="font-size:11px;color:#e8eaed;line-height:1.55;margin-bottom:6px;">'+tl.conclusion+'</div>';
+    }
+    if(tl.agree&&tl.agree.length){
+      body+='<div style="font-size:11px;margin:4px 0;"><span style="color:#7ee0a3;font-weight:600;">三方一致维度：</span>';
+      tl.agree.forEach(function(a){
+        body+='<span style="display:inline-block;background:rgba(126,224,163,.14);border:1px solid rgba(126,224,163,.4);color:#7ee0a3;padding:2px 8px;border-radius:10px;font-size:10.5px;margin:2px;">'+a.dim+'→'+a.consensus+'</span>';
+      });
+      body+='</div>';
+    }
+    if(tl.diff&&tl.diff.length){
+      body+='<div style="font-size:11px;margin:4px 0;"><span style="color:#ffb366;font-weight:600;">三方分歧维度：</span>';
+      tl.diff.forEach(function(d){
+        body+='<span style="display:inline-block;background:rgba(255,179,102,.1);border:1px solid rgba(255,179,102,.35);color:#ffb366;padding:2px 8px;border-radius:10px;font-size:10.5px;margin:2px;">'+d.dim+'</span>';
+      });
+      body+='</div>';
+    }
+    if(tl.sources&&tl.sources.length){
+      body+='<div style="font-size:11px;margin-top:5px;color:#8fa8d8;">研判来源：';
+      tl.sources.forEach(function(s){
+        body+='<span style="margin-right:8px;">• '+(s.source||'')+'('+(s.n_conclusions||0)+'项)</span>';
+      });
+      body+='</div>';
+    }
+    if(tl.rec){
+      body+='<div style="font-size:11px;margin-top:6px;line-height:1.6;"><span class="c-gold">共识综合建议：</span>热号 '
+        +((tl.rec.hot_front||[]).join(' '))+' ｜ 后区Top3 '+(tl.rec.back_top3||[]).join(' ')
+        +' ｜ '+(tl.rec.shape_hint||'')+'</div>';
+    }
+    body+='</div>';
+  }
+  if(dbv&&dbv.judge){
+    body+='<div style="border:1px solid rgba(148,178,255,.25);background:rgba(148,178,255,.06);border-radius:10px;padding:8px;margin-top:8px;">';
+    body+='<div style="font-size:12px;font-weight:600;color:#c9d8f5;margin-bottom:6px;">🧠 豆包AI独立研判 <span class="tag">数据驱动</span></div>';
+    dbv.judge.forEach(function(jd){
+      body+='<div style="display:flex;gap:8px;font-size:11px;padding:2px 0;border-bottom:1px dashed rgba(148,178,255,.12);">';
+      body+='<span style="min-width:60px;color:#8fa8d8;">'+jd.dim+'</span>';
+      body+='<span style="color:#e8eaed;font-weight:600;">'+(jd.concl||'')+'</span>';
+      body+='<span style="color:#7d8db0;font-size:10px;flex:1;">'+(jd.reason||'')+'</span>';
+      body+='</div>';
+    });
+    if(dbv.rec){
+      body+='<div style="font-size:11px;margin-top:6px;line-height:1.6;"><span class="c-gold">豆包综合建议：</span>'
+        +(dbv.rec.reason||'')+'</div>';
+    }
+    body+='</div>';
+  }
+  html+=foldCard('pred_review', '外部研判接入（豆包/DeepSeek/ChatGPT）<span class="tag">'+(pk.period||'')+'期 三源智囊团</span>', body, false);
+  return html;
+}
+function genReviewPack(){
+  var cfg=loadCfg();
+  var msg=document.getElementById('rv-msg');
+  if(!cfg.remoteBase){ if(msg){msg.textContent='请先在「关于」页配置远程服务器地址'; msg.style.color='#c62828';} return; }
+  if(msg){msg.textContent='正在生成研判数据包（发送豆包/DeepSeek/ChatGPT 三方，约30-90秒）...'; msg.style.color='#c8891f';}
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/review_pack?token=kcyc2026&game='+(G==='dlt'?'dlt':'ssq'), 15000, {method:'POST'})
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.status==='started'||d.status==='busy'){
+        pollReviewStatus(msg, 0);
+      } else if(msg){ msg.textContent='生成失败：'+(d.msg||d.status); msg.style.color='#c62828'; }
+    })
+    .catch(function(e){ if(msg){msg.textContent='✗ 无法连接服务器：'+e.message; msg.style.color='#c62828';} });
+}
+function pollReviewStatus(msg, tick){
+  if(tick>24){ if(msg)msg.textContent='已等待约2分钟，请稍后在「关于」页点立即同步数据查看结果'; return; }
+  var cfg=loadCfg();
+  if(!cfg.remoteBase) return;
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/review/status', 8000)
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if(d.running){ if(msg)msg.textContent='研判数据包生成中...（已等待约'+Math.round((tick+1)*8/60*10)/10+'分钟）'; setTimeout(function(){ pollReviewStatus(msg, tick+1); }, 8000); }
+      else if(d.result){
+        if(d.result.status==='done'){ if(msg){msg.textContent='✓ 研判数据包已生成（耗时'+d.result.elapsed+'秒），正在拉取最新研判数据...'; msg.style.color='#2e7d32';} syncNowSilent(); }
+        else { if(msg){msg.textContent='生成未成功：'+(d.result.msg||d.result.status||d.result.output||'').slice(0,120); msg.style.color='#c62828';} }
+      }
+      else { if(msg)msg.textContent='服务器暂无生成记录，请确认电脑端已运行'; }
+    })
+    .catch(function(){ if(msg){msg.textContent='✗ 查询失败，请检查WiFi与服务器'; msg.style.color='#c62828';} });
+}
+
+
+function modelColor(name){
+  name=name||'';
+  if(name.indexOf('贝叶斯')>=0)return 'mn-bayes';
+  if(name.indexOf('马尔可夫')>=0)return 'mn-markov';
+  if(name.indexOf('LSTM')>=0||name.indexOf('时序')>=0||name.indexOf('深度')>=0||name.indexOf('Transformer')>=0)return 'mn-lstm';
+  if(name.indexOf('统计')>=0||name.indexOf('遗漏')>=0||name.indexOf('指数')>=0||name.indexOf('频率')>=0)return 'mn-stats';
+  if(name.indexOf('智能')>=0||name.indexOf('AI')>=0||name.indexOf('集成')>=0||name.indexOf('共现')>=0||name.indexOf('GBDT')>=0)return 'mn-ai';
+  if(name.indexOf('融合')>=0||name.indexOf('DeepSeek')>=0)return 'mn-fusion';
+  if(name.indexOf('自适应')>=0)return 'mn-engine';
+  return '';
+}
+
+function renderJudge10(){
+  var jd=(DATA.judge_10d||{})[G]||{};
+  if(!jd||!jd.doubao_judge){
+    var _note = (G==='ssq')
+      ? '<div class="empty" style="padding:18px;font-size:13px;line-height:1.9;color:#c9d8f5;">ℹ️ 双色球 10 维三方研判尚未生成。<br>当前仅大乐透已接入 10 维研判；<br>切换到大乐透查看，双色球下期开奖后自动补跑研判。</div>'
+      : '<div class="empty">暂无 10 维度三方研判数据，请先在电脑端运行研判引擎。</div>';
+    $('tab-judge10').innerHTML=_note; return; }
+  var html='';
+  html+='<div class="switch">';
+  ['dlt','ssq'].forEach(function(k){ html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderJudge10();">'+DATA.games[k].meta.name+'</button>'; });
+  html+='</div>';
+  var wn=jd.window||{};
+  var tag='';
+  if(wn.recent){ tag='近'+wn.recent+'期×'+(wn.recent_weight||0.75)+' + 全量×'+(wn.full_weight||0.25); }
+  var cn=jd.consensus_main||{}, dbn=jd.doubao_numbers||{}, ds=jd.deepseek||{};
+  var rows=[
+    {label:'综合主推', f:cn.front, b:cn.back, star:true, note:(cn.note||'')},
+    {label:'豆包主推', f:(dbn.main||{}).front, b:(dbn.main||{}).back, star:false, note:''},
+    {label:'DeepSeek主推', f:(ds.main||{}).front, b:(ds.main||{}).back, star:false, note:ds.main?'两方一致'+(ds.agree||[]).length+'/10维':(jd.deepseek_note||'未参与')}
+  ];
+  // v1.7.8 前端兜底：双色球后区只取1个(防大模型返回错结构)
+  if(G==='ssq'){ rows.forEach(function(r){ if(r.b&&r.b.length>1) r.b=[r.b[0]]; }); }
+  html+='<div class="card" style="border-color:rgba(255,179,102,.4);background:linear-gradient(160deg,rgba(255,179,102,.08),rgba(8,15,32,.6));">';
+  html+='<div class="card-t" style="color:#ffcc99;font-size:14.5px;">🎯 10维度三方研判</div>';
+  html+='<div style="font-size:11px;color:#9fb0d0;margin:-2px 0 6px;">第 <span style="color:#ffcc99;font-weight:700;">'+(jd.next_period||'--')+'</span> 期 · '+(tag||'')+'</div>';
+  rows.forEach(function(r,i){
+    if(!r.f||!r.f.length) return;
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:9px 0;'+(i>0?'border-top:1px dashed rgba(255,179,102,.2);':'')+'">';
+    html+='<div style="flex:0 0 88px;font-size:12px;'+(r.star?'color:#ffcc99;':'color:#c9d8f5;')+'font-weight:600;line-height:1.4;">'+(r.star?'★ ':'')+r.label+'</div>';
+    html+='<div style="flex:1;min-width:0;">';
+    html+='<div class="balls">'+fmtBalls(r.f,'r')+'<span style="color:#7d8db0;margin:0 3px;">＋</span>'+fmtBalls(r.b,'b')+'</div>';
+    if(r.note){ html+='<div style="font-size:10px;color:#7d8db0;margin-top:3px;">'+r.note+'</div>'; }
+    html+='</div></div>';
+  });
+  html+='</div>';
+
+  html+='<div class="card"><div class="card-t">三方参与状态</div>';
+  html+='<div style="font-size:11.5px;line-height:2;color:#e8eaed;">';
+  html+='<div>🧠 豆包：<span style="color:#7ee0a3;">已研判</span>（10维度统计画像 + 号码合成）</div>';
+  html+='<div>🤖 DeepSeek：'+(ds.main?'<span style="color:#7ee0a3;">已评审</span>（一致 '+(ds.agree||[]).length+'/10 维'+(ds.disagree&&ds.disagree.length?'，分歧 '+ds.disagree.length+' 条':'')+'）':'<span style="color:#ffb366;">'+(jd.deepseek_note||'未参与')+'</span>')+'</div>';
+  html+='<div>💬 ChatGPT：'+(jd.chatgpt_note?'<span style="color:#ffb366;">'+jd.chatgpt_note+'</span>':'<span style="color:#7ee0a3;">已接入</span>')+'</div>';
+  html+='</div></div>';
+
+  var dims=jd.doubao_judge, dnames={D1:'段分布',D2:'首号',D3:'连号',D4:'带几热',D5:'冷尾',D6:'重号',D7:'后区大小',D8:'后区连号',D9:'后区重号',D10:'其他'};
+  html+='<div class="card"><div class="card-t" style="cursor:pointer;" onclick="var e=document.getElementById(\'jd-dims\');e.style.display=e.style.display===\'none\'?\'block\':\'none\';">📊 10 维度结论（点击展开/收起）</div><div id="jd-dims" style="display:none;">';
+  Object.keys(dims).forEach(function(k){
+    html+='<div style="display:flex;gap:7px;font-size:11px;padding:5px 0;border-bottom:1px dashed rgba(255,179,102,.12);">';
+    html+='<span style="min-width:52px;color:#e6a35c;font-weight:600;">'+(dnames[k]||k)+'</span>';
+    html+='<span style="color:#e8eaed;flex:1;line-height:1.55;">'+(dims[k]||'')+'</span></div>';
+  });
+  html+='</div></div>';
+  $('tab-judge10').innerHTML=html;
+}
+
+function renderPred(){
+  var g=DATA.games[G], html='';
+  html+='<div class="switch">';
+  ['dlt','ssq'].forEach(function(k){
+    html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderPred();">'+DATA.games[k].meta.name+'</button>';
+  });
+  html+='</div>';
+  var p=g.predictions, main=p.items.filter(function(x){return x.main;})[0]||p.items[0];
+  var odd=main.front.filter(function(n){return n%2===1;}).length, sum=main.front.reduce(function(a,b){return a+b;},0);
+  var span=Math.max.apply(null,main.front)-Math.min.apply(null,main.front);
+  html+='<div class="card maincard">';
+  html+='<div class="period-line">第 <span class="c-grad-gold">'+p.period+'</span> 期综合推荐 · 基于 <span class="c-cyan">'+p.latestPeriod+'</span> 期历史数据 · <span class="c-blue">'+g.meta.drawDays+'</span>开奖 · <span class="c-green">预测可随时刷新</span></div>';
+  html+='<div class="balls">'+fmtBalls(main.front,'r')+fmtBalls(main.back,'b')+'</div>';
+  // 蓝球/后区Top5候选（P0-2蓝球独立通道，v1.6.1 由Top3扩至Top5）
+  var _bt = (main.meta&&(main.meta.blue_top5||main.meta.blue_top3))||[];
+  if(_bt.length){
+    html+='<div style="margin-top:6px;font-size:12.5px;color:#c9d8f5;"><span class="c-gold">'+(G==='dlt'?'后区':'蓝球')+'Top'+(main.meta.blue_top5?'5':'3')+'候选：</span>'+_bt.map(function(n){return '<span class="mball b" style="width:22px;height:22px;font-size:11px;line-height:22px;">'+n+'</span>';}).join('')+'</div>';
+  }
+  // v7.2: 推荐理由和数据来源
+  var con=p.consensus||{}, hc=con.high_confidence||[];
+  html+='<div class="meta-grid" style="margin-top:8px;">';
+  html+='<div class="meta-item">推荐策略<b class="c-cyan">'+(main.meta&&main.meta.base?main.meta.base:'自适应最优')+'</b></div>';
+  html+='<div class="meta-item">共识信号<b class="c-purple">'+(hc.length?hc.join(','):'无')+'</b></div>';
+  html+='<div class="meta-item">反馈核验<b class="'+(main.meta&&main.meta.feedback?'c-green':'c-orange')+'">'+(main.meta&&main.meta.feedback?'已优化':'积累中')+'</b></div>';
+  html+='</div>';
+  html+='<div class="note" style="margin-top:6px;font-size:12px;color:#8fa8d8;">'+p.latestPeriod+'期官方数据 · 全模型深度融合 · 动态权重 · DeepSeek AI研判</div>';
+  // v23.2 科学口径：单注命中精确概率分布（数学上限，诚实标注）
+  var hd=p.hit_dist||{front:[],back:[]}, fn=hd.front||[], bn=hd.back||[];
+  if(fn.length){
+    var p0=fn[0]||0, p1=fn[1]||0, p2=fn[2]||0, p3=0;
+    for(var hi=3;hi<fn.length;hi++){p3+=fn[hi]||0;}
+    var b1=bn[1]||0, b2=bn[2]||0, p31=p3*b1/100+(b2?p3*b2/10000:0);
+    html+='<div class="note" style="margin-top:4px;font-size:11px;color:#8fa8d8;">科学口径：单注命中≥3球概率约 <b>'+p3.toFixed(2)+'%</b>（3+1约 '+p31.toFixed(2)+'%），开奖独立随机，理性购彩。</div>';
+  }
+  if(main.meta){
+    var m=main.meta, mc=m.mabCounts||{}, order=['A全量Top','B全量冷','C30冷','D10热','E区间均衡'];
+    var dist=order.map(function(s){return s+' '+(mc[s]||0);}).join(' / ');
+    html+='<div class="meta-grid">';
+    html+='<div class="meta-item">基础策略<b>'+(m.base||'-')+'</b></div>';
+    html+='<div class="meta-item">奇偶·和值·跨度<b>'+odd+':'+(main.front.length-odd)+' · '+sum+' · '+span+'</b></div>';
+    html+='</div>';
+  }
+  html+='</div>';
+  // v1.2 投注执行层：覆盖率方案（全池均匀覆盖，唯一投注推荐；其余模型为参考信号）
+  var cov=g.coverage;
+  if(cov&&cov.plans){
+    var cvb='';
+    var bt=cov.backtest_10||{};
+    if(bt['期数']){
+      cvb+='<div class="note" style="font-size:11.5px;color:#c9d8f5;line-height:1.6;">诚实回测(近'+bt['期数']+'期·10注)：单注均红 系统<b class="c-cyan">'+bt['系统单注均红']+'</b> vs 随机'+bt['随机单注均红']+' | 最佳注≥3红 系统'+bt['系统最佳注≥3红']+'% vs 随机'+bt['随机最佳注≥3红']+'% | 单注蓝球 系统'+bt['系统单注蓝球命中']+'% vs 随机'+bt['随机单注蓝球命中']+'%</div>';
+    }
+    // v1.7.7：仅精选3注（取覆盖率最高方案的前3注），不再全量展示
+    var _bestNk='15'; if(cov.plans['10']) _bestNk='10'; if(cov.plans['8']) _bestNk='8';
+    var _bestPl=cov.plans[_bestNk]||cov.plans['15']||cov.plans['10']||cov.plans['8'];
+    if(_bestPl){
+      cvb+='<div style="font-size:11.5px;color:#9fb0d0;margin-bottom:4px;">精选 3 注（覆盖前区 <b class="c-green">'+_bestPl.cover_front+'/'+(G==='dlt'?35:33)+'</b> · 蓝球Top3 <span class="c-gold">'+(_bestPl.blue_top3||[]).join(',')+'</span>）</div>';
+      (_bestPl.tickets||[]).slice(0,3).forEach(function(t,ti){
+        cvb+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#0e9f6e,#34d399);">'+(ti+1)+'</span>'+
+             t.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+
+             '<span class="cplus">+</span>'+
+             (t.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+'</div>';
+      });
+    }
+    html+=foldCard('pred_cov', '投注执行层<span class="tag">精选3注 · 各模型为参考信号</span>', cvb, false);
+  }
+  // v1.6.6 各模型推荐：每模型1注（大号+颜色区分）
+  var _t3items=p.items.filter(function(x){return x.tickets&&x.tickets.length;});
+  if(_t3items.length){
+    var t3='';
+    var _mcolors=['#4fd8f0','#c3a8ff','#ffc75a','#0e9f6e','#ff8fa3','#7c5cff'];
+    _t3items.forEach(function(it,mi){
+      var t0=it.tickets[0];
+      if(!t0)return;
+      var bArr=Array.isArray(t0.back)?t0.back:(t0.back!==undefined&&t0.back!==null?[t0.back]:[]);
+      var mc=_mcolors[mi%_mcolors.length];
+      t3+='<div style="margin-top:8px;padding:7px 10px;border-radius:10px;background:rgba(148,178,255,.06);border-left:3px solid '+mc+';">';
+      t3+='<div style="font-weight:600;color:'+mc+';font-size:13px;margin-bottom:5px;">'+it.name+'</div>';
+      t3+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;">'+
+          (t0.front||[]).map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, '+mc+'cc, '+mc+' 55%, '+mc+'99);box-shadow:0 2px 7px '+mc+'66;">'+n+'</span>';}).join('')+
+          '<span class="cplus" style="font-size:13px;margin:0 2px;">+</span>'+
+          bArr.map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, #9cc0ff, #3f76e0 60%, #2a4fa8);box-shadow:0 2px 7px rgba(79,140,255,.35);">'+n+'</span>';}).join('')+'</div>';
+      t3+='</div>';
+    });
+    html+=foldCard('pred_t3', '各模型推荐<span class="tag">每模型1注</span>', t3, false);
+  }
+  // v1.6.8 融合大模型推荐：实际2注完整展示（融合主推 + 组A概率统计，前区+后区同一行）
+  var fu=g.fusion;
+  if(fu&&fu.groups){
+    var fb2='';
+    var _fused=[];
+    var mainF=fu.main||{};
+    if(mainF.front&&mainF.front.length){ _fused.push({tag:'注1 融合主推', f:mainF.front||[], b:mainF.back||[], col:'#34d399'}); }
+    var gpA=fu.groups['组A概率统计'];
+    if(gpA&&gpA[0]&&gpA[0].length){ _fused.push({tag:'注2 组A概率统计', f:gpA[0], b:gpA[1]||[], col:'#4fd8f0'}); }
+    _fused.forEach(function(z,zi){
+      fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;margin-top:'+(zi?8:0)+'px;">';
+      fb2+='<span style="flex:0 0 auto;font-size:11px;font-weight:700;color:'+z.col+';background:rgba(148,178,255,.08);border:1px solid '+z.col+'44;border-radius:8px;padding:2px 8px;margin-right:8px;">'+z.tag+'</span>';
+      fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;min-width:0;">'+
+           z.f.map(function(n){return '<span class="mball r" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+
+           '<span class="cplus" style="font-size:13px;">+</span>'+
+           z.b.map(function(n){return '<span class="mball b" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+'</div>';
+      fb2+='</div>';
+    });
+    if(_fused.length){ html+=foldCard('pred_fusion', '融合大模型推荐<span class="tag">'+(fu.target||'')+'期 2注</span>', fb2, false); }
+  }
+  // v3 四模型去相关组合（热号/冷号/区间/共现）
+  var v3=(app.v3_combo||{})[G];
+  if(v3&&v3.models&&v3.models.length){
+    var v3h='';
+    v3h+='<div class="note" style="font-size:12px;color:#c9d8f5;line-height:1.7;margin-bottom:6px;">基于2929期历史数据·4模型评分排序·形态硬约束·去相关≤3重叠</div>';
+    v3.models.forEach(function(m,mi){
+      v3h+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#f0b24a,#e08a1e);">'+(mi+1)+'</span>';
+      v3h+='<span style="font-size:11px;font-weight:700;color:#f0b24a;margin-right:6px;min-width:60px;">'+m.name+'</span>';
+      v3h+=m.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('');
+      v3h+='<span class="cplus">+</span>';
+      v3h+=(m.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('');
+      v3h+='</div>';
+    });
+    html+=foldCard('pred_v3', 'v3四模型组合<span class="tag">'+(v3.period||'')+'期 4注去相关</span>', v3h, false);
+  }
+  // v1.6.5 独立「经验规律模型」：与旧系统并列对比验证
+  var ex=g.exp_model;
+  if(ex&&ex.tickets&&ex.tickets.length){
+    var exb='';
+    var st=ex.structure||{};
+    exb+='<div class="note" style="font-size:12px;color:#c9d8f5;line-height:1.7;">';
+    exb+='<span class="c-gold">结构预测：</span>必带数字 <b class="c-cyan">'+(st.must_digits||[]).join(',')+'</b> · 连号 <b>'+(st.lian_yes?'是':'否')+'</b>('+(st.lian_prob||0)+'%)';
+    if(st.zone_n){
+      var zn=st.zone_n||[], zt=(G==='dlt'?['1-9','10-19','20-29','30-35']:['1-9','10-19','20-29','30-33']);
+      exb+=' · 各段 '+zn.map(function(c,i){return zt[i]+'段'+c+'个';}).join('/');
+    }
+    exb+=' · 最小号≈'+(st.front_min||'-');
+    if(st.back_struct){
+      var bk2='';
+      for(var kb in st.back_struct){ if(typeof st.back_struct[kb]==='number'){bk2+=' '+(kb==='small'?'小号':(kb==='big'?'大号':kb))+' '+Math.round(st.back_struct[kb]*100)+'%'; } }
+      exb+='<br/>后区：'+bk2+' · 与前区重号'+(st.overlap_prob||0)+'%';
+    }
+    // v1.6.5+ 扩展参数（豆包+DeepSeek综合新增）
+    var ext='';
+    if(st.sum_band){ ext+='<span class="c-gold">和值带</span>'+st.sum_band[0]+'-'+st.sum_band[1]+'(中枢'+(st.sum_center||'-')+')'; }
+    if(st.span_band){ ext+=' · <span class="c-gold">跨度</span>'+st.span_band[0]+'-'+st.span_band[1]; }
+    if(st.odd_even){ ext+=' · <span class="c-gold">奇偶</span>'+st.odd_even; }
+    if(st.repeat_front!=null){ ext+=' · <span class="c-gold">重号</span>≤'+(st.repeat_front+1); }
+    if(st.hot_cold&&st.hot_cold.target){ ext+=' · <span class="c-gold">冷热</span>'+st.hot_cold.target; }
+    if(st.back_omit&&st.back_omit.length){ ext+=' · <span class="c-gold">后区遗漏≥12</span>'+st.back_omit.join(','); }
+    if(st.zone_flow){ ext+=' · <span class="c-gold">区流</span>'+st.zone_flow.join(','); }
+    if(st.sum_delta){ ext+=' · <span class="c-gold">和值差</span>≤'+st.sum_delta[1]; }
+    if(st.back_repeat!=null){ ext+=' · <span class="c-gold">后区无重号</span>'+st.back_repeat+'%'; }
+    if(ext){ exb+='<br/><span style="color:#4fd8f0;">扩展：</span>'+ext; }
+    exb+='</div>';
+    (ex.tickets||[]).slice(0,3).forEach(function(t,ti){
+      exb+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#7c5cff,#4fd8f0);">'+(ti+1)+'</span>'+
+           t.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+
+           '<span class="cplus">+</span>'+
+           (t.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+'</div>';
+    });
+    if(ex.main_pick){
+      var _mpf=Array.isArray(ex.main_pick)?(ex.main_pick[0]||[]):(ex.main_pick.front||[]);
+      var _mpb=Array.isArray(ex.main_pick)?(ex.main_pick[1]||[]):(ex.main_pick.back||[]);
+      if(_mpf.length){
+        exb+='<div class="note" style="margin-top:6px;font-size:12px;color:#8fa8d8;">★ 主推：'+_mpf.join(',')+'+'+_mpb.join(',')+'（开奖后与旧系统并列核验对比，见回测核验栏）</div>';
+      }
+    }
+    html+=foldCard('pred_exp', '经验规律模型<span class="tag">'+(ex.period||'')+'期 独立预测·与旧系统对比</span>', exb, true);
+  }
+  html+=renderPatternCard(g);
+  html+=renderFullScan(g);
+  html+=renderExternalReview(g);
+  var contrib=(p.contrib||[]).slice();
+  contrib.sort(function(a,b){return (b.weight||0)-(a.weight||0);});
+  var cwb='';
+  if(contrib.length){
+    contrib.forEach(function(it){
+      var hit=it.hit_avg!==null&&it.hit_avg!==undefined?('<span class="mstat">近5期命中 '+it.hit_avg+'球</span>'):'<span class="mstat">核验积累中</span>';
+      var wbar=Math.min(100, Math.round((it.weight||0)/2.5*100));
+      cwb+='<div class="cbar-row" style="border-bottom:1px dashed rgba(148,178,255,.1);padding:7px 0;"><span style="min-width:118px;font-size:11.5px;color:#c9d8f5;">'+it.name+'</span><div class="cbar-track" style="flex:1;margin:0 8px;"><div class="cbar-fill '+(it.weight>=1.1?'hi':(it.weight>=0.9?'mid':'lo'))+'" style="width:'+wbar+'%;min-width:26px;font-size:10px;">'+(it.weight||0).toFixed(2)+'</div></div>'+hit+'</div>';
+    });
+  } else {
+    cwb+='<div class="note" style="color:#8fa8d8;">等待下期预测生成</div>';
+  }
+  html+=foldCard('pred_contrib', '模型权重贡献榜<span class="tag">融合内部依据</span>', cwb, false);
+  $('tab-pred').innerHTML=html;
+}
+
+
+function toggleModel(idx){
+  var rows=document.querySelectorAll('#tab-pred .mrow');
+  if(rows[idx]){ rows[idx].classList.toggle('open'); }
+}
+
+
+function showCombo(i){
+  var panes=document.querySelectorAll('.combo-pane');
+  for(var k=0;k<panes.length;k++){panes[k].style.display=(k===i?'':'none');}
+  var tabs=document.querySelectorAll('.ctab');
+  for(var m=0;m<tabs.length;m++){tabs[m].className=(m===i?'ctab on':'ctab');}
+}
+
+function renderHist(){
+  var g=DATA.games[G], html='';
+  html+='<div class="switch">';
+  ['dlt','ssq'].forEach(function(k){html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderHist();">'+DATA.games[k].meta.name+'</button>';});
+  html+='</div>';
+  html+='<div class="card"><h2 style="color:#4fd8f0;">最近开奖 <span class="tag">'+g.meta.latestPeriod+' 期为止</span></h2>';
+  g.history.forEach(function(h){
+    html+='<div class="his-row"><div class="p c-gold">'+h.period+'</div><div class="balls">'+fmtHBalls(h.front,'r')+fmtHBalls(h.back,'b')+'</div></div>';
+  });
+  html+='</div>';
+  var fr=g.freq.front, maxf=Math.max.apply(null,Object.keys(fr).map(function(k){return fr[k];}));
+  var cells=[];
+  var fMax=Math.max.apply(null,Object.keys(fr).map(Number))||(G==='dlt'?35:33);
+  for(var i=1;i<=fMax;i++){var v=fr[i]||0;cells.push('<div class="fcell" style="background:'+heatColor(v,maxf)+'">'+i+'</div>');}
+  html+='<div class="card"><h2 style="color:#ffb366;">'+g.meta.frontName+'热度（近100期）</h2><div class="freq-wrap">'+cells.join('')+'</div></div>';
+  html+='<div class="card"><h2 style="color:#7ee787;">频次柱状图</h2><canvas id="freqChart" style="width:100%;height:140px;display:block;"></canvas></div>';
+  $('tab-hist').innerHTML=html;
+  setTimeout(drawFreq,50);
+}
+function drawFreq(){
+  var cv=document.getElementById('freqChart'); if(!cv)return;
+  var g=DATA.games[G]; var fr=g.freq.front;
+  var maxN=G==='dlt'?35:33; var maxF=0; for(var i=1;i<=maxN;i++){maxF=Math.max(maxF,fr[i]||0);}
+  var dpr=window.devicePixelRatio||1; var W=cv.clientWidth, H=140;
+  cv.width=W*dpr; cv.height=H*dpr; var ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
+  var bw=W/maxN;
+  for(var i=1;i<=maxN;i++){
+    var v=fr[i]||0; var h=v/maxF*(H-24);
+    ctx.fillStyle=v>=maxF*0.8?'#ff6b6b':(v>=maxF*0.5?'#ffb366':'#4fd8f0');
+    ctx.fillRect((i-1)*bw+1, H-h-16, Math.max(1,bw-2), h);
+    ctx.fillStyle='#888'; ctx.font='8px sans-serif'; ctx.fillText(i, (i-1)*bw, H-4);
+  }
+}
+
+function renderBt(){
+  var html='';
+  ['dlt','ssq'].forEach(function(k){
+    var g=DATA.games[k], b=g.backtest;
+    var body='';
+    if(!b){ body='<div class="empty">暂无回测数据</div>'; }
+    else{
+      var maxm=Math.max.apply(null,b.rank.map(function(r){return r.mean400;}));
+      b.rank.forEach(function(r,i){
+        body+='<div class="bar-row"><div class="nm">'+r.name+'</div><div class="bar-track"><div class="bar-fill'+(i===0?' top':'')+'" style="width:'+Math.max(14,r.mean400/maxm*100)+'%">'+r.mean400.toFixed(3)+'</div></div></div>';
+      });
+      body+='<div class="note">训练最优: <b class="c-green">'+b.holdout+'</b> · 理论随机期望: <b class="c-cyan">'+b.theo.toFixed(4)+'</b></div>';
+    }
+    html+=foldCard('bt_rank_'+k, g.meta.name+' 回测选优<span class="tag">walk-forward 400期</span>', body, true);
+    if(b && b.significance && b.significance.length){
+      var sbody='';
+      sbody+='<table class="sig-table"><tr><th>策略</th><th>均值</th><th>95%CI</th><th>p值</th><th>结论</th></tr>';
+      b.significance.forEach(function(s){
+        sbody+='<tr><td>'+s.name+'</td><td>'+s.mean.toFixed(4)+'</td><td>'+s.ci_lo.toFixed(3)+'~'+s.ci_hi.toFixed(3)+'</td><td>'+s.p.toFixed(4)+'</td><td class="'+(s.p<0.05?'ok':'no')+'">'+(s.p<0.05?'显著':'不显著')+'</td></tr>';
+      });
+      sbody+='</table>';
+      html+=foldCard('bt_sig_'+k, g.meta.name+' 显著性检验<span class="tag">排列检验 p&lt;0.05 显著</span>', sbody, false);
+    }
+  });
+  $('tab-btverify').innerHTML=html;
+}
+
+function renderVerify(){
+  var html='';
+  // ===== 目标里程碑进度（5级阶梯）=====
+  var pr={};
+  ['dlt','ssq'].forEach(function(_kk){ if(DATA.games&&DATA.games[_kk]&&DATA.games[_kk].progress) pr[_kk]=DATA.games[_kk].progress; });
+  var MSDEF={M1:'前区≥3+后区≥1',M2:'前区≥4+后区≥1',M3:'前区≥4',M4:'前区≥5+后区≥1',M5:'前后区完全符合'};
+
+  // v7.2: 6综合模型白名单（含别名），过滤旧模型
+  var KEEP6=['贝叶斯','马尔可夫','LSTM','Transformer','时序','指数平滑','遗漏','统计特征','AI智能','梯度提升','GBDT','共现','智能集成','多源融合','DeepSeek','综合共识','AI综合融合','自适应引擎'];
+  function isKeep6(name){ for(var i=0;i<KEEP6.length;i++){ if(name.indexOf(KEEP6[i])>=0) return true; } return false; }
+  // 旧模型名映射到6综合模型
+  function map6(name){
+    if(name.indexOf('贝叶斯')>=0) return '①贝叶斯概率';
+    if(name.indexOf('马尔可夫')>=0) return '②马尔可夫转移';
+    if(name.indexOf('LSTM')>=0||name.indexOf('Transformer')>=0||name.indexOf('时序')>=0) return '③时序深度学习';
+    if(name.indexOf('指数平滑')>=0||name.indexOf('遗漏')>=0||name.indexOf('统计')>=0||name.indexOf('泊松')>=0||name.indexOf('频率')>=0) return '④统计特征';
+    if(name.indexOf('AI智能')>=0||name.indexOf('梯度提升')>=0||name.indexOf('GBDT')>=0||name.indexOf('共现')>=0||name.indexOf('智能集成')>=0||name.indexOf('相似')>=0||name.indexOf('FFT')>=0) return '⑤智能集成';
+    if(name.indexOf('多源融合')>=0||name.indexOf('DeepSeek')>=0||name.indexOf('综合共识')>=0||name.indexOf('AI综合融合')>=0||name.indexOf('融合')>=0) return '⑥多源融合';
+    if(name.indexOf('自适应引擎')>=0) return '自适应引擎(主推)';
+    return name;
+  }
+  ['dlt','ssq'].forEach(function(k){
+    var g=DATA.games[k], f=DATA.feedback[k]||{periods:[],summaries:{}};
+    var vm=(DATA.verify_monitor||{})[k]||{};
+    // 过滤summaries只保留6模型
+    var sm6={};
+    Object.keys(f.summaries||{}).forEach(function(nm){ if(isKeep6(nm)){ var m6=map6(nm); if(!sm6[m6]) sm6[m6]={avg:0,count:0,total:0}; sm6[m6].avg+=f.summaries[nm].avg; sm6[m6].count++; sm6[m6].total+=f.summaries[nm].avg; } });
+    Object.keys(sm6).forEach(function(m){ sm6[m].avg=sm6[m].total/sm6[m].count; });
+    f={periods:f.periods, summaries:sm6};
+    // ===== 目标里程碑（v1.5.7 折叠，默认展开）=====
+    var mb='';
+    var pg=pr[k];
+    if(pg){
+      ['M1','M2','M3','M4','M5'].forEach(function(m){
+        var ach=pg.achieved&&pg.achieved[m]||0, th=pg.theory&&pg.theory[m]||0;
+        var pct=th>0?Math.min(100,Math.round(ach/th*100)):0;
+        mb+='<div style="display:flex;align-items:center;gap:6px;margin:5px 0;font-size:12.5px;">';
+        mb+='<span style="min-width:34px;font-weight:700;color:'+(ach>0?'#34a853':'#8fa8d8')+';">'+m+'</span>';
+        mb+='<span style="min-width:150px;color:#c9d8f5;">'+MSDEF[m]+'</span>';
+        mb+='<span style="min-width:72px;color:#8fa8d8;font-size:11px;">随机≈1/'+(th>0?Math.round(100/th):'-')+'期</span>';
+        mb+='<span style="min-width:60px;color:'+(ach>0?'#34a853':'#ff8a80')+';font-weight:600;">达成 '+ach+'次</span>';
+        mb+='</div>';
+      });
+      if(pg.best){
+        var bb=pg.best;
+        mb+='<div class="note" style="margin-top:4px;"><b style="color:#ffd54a;">历史最佳：</b>'+bb[0]+'期 '+bb[2]+' '+bb[1]+'（'+bb[3]+'+'+bb[4]+'）</div>';
+      }
+      html+=foldCard('vm_goal_'+k, g.meta.name+' 目标里程碑<span class="tag">达成路径</span>', mb, true);
+    }
+    // ===== 核验监控（折叠，默认收起）=====
+    if(vm.stage){
+      var vmb='';
+      vmb+='<div class="vm-stage">'+vm.stageDesc+'</div>';
+      if(vm.milestone&&vm.milestone.next){
+        var ms=vm.milestone;
+        vmb+='<div class="bar-row"><div class="nm" style="width:64px;text-align:right;">累计期数</div><div class="bar-track"><div class="bar-fill" style="width:'+ms.pct+'%">'+f.periods.length+' / '+ms.next.n+' 期</div></div></div>';
+        vmb+='<div class="note">下一节点：'+ms.next.n+' 期（'+ms.next.label+'）· 还需 '+ms.left+' 期</div>';
+      }
+      if(vm.power){
+        vmb+='<div class="fb-box"><div class="fb-top"><span>功效分析（α=0.05, power=0.8）</span><span>最优 '+vm.power.strategy+'</span></div>';
+        vmb+='<div>策略均值 <b>'+vm.power.strat_mean.toFixed(3)+'</b> · 随机期望 <b>'+vm.power.theo.toFixed(4)+'</b> · 效应量 Δ='+vm.power.eff+'</div>';
+        vmb+='<div>统计显著需约 <b>'+vm.power.n_needed+'</b> 期 · 当前进度 <b>'+vm.power.progress+'%</b></div>';
+        vmb+='</div>';
+      }
+      html+=foldCard('vm_mon_'+k, g.meta.name+' 核验监控 <span class="tag">'+vm.stage+' · 已核验 '+f.periods.length+' 期</span>', vmb, false);
+    }
+    var sm=f.summaries;
+    var keys=Object.keys(sm);
+    // ===== 模型命中率排名（折叠，默认展开）=====
+    if(keys.length){
+      var kb='';
+      var sorted=keys.sort(function(a,b){return sm[b].avg-sm[a].avg;});
+      var maxv=Math.max.apply(null,sorted.map(function(n){return sm[n].avg;}));
+      sorted.forEach(function(nm,i){
+        var short=nm.length>10?nm.slice(0,10)+'…':nm;
+        kb+='<div class="bar-row"><div class="nm" style="width:88px;text-align:left;font-size:11px;">'+short+'</div><div class="bar-track"><div class="bar-fill'+(i===0?' top':'')+'" style="width:'+Math.max(12,sm[nm].avg/maxv*100)+'%">'+sm[nm].avg.toFixed(2)+'</div></div></div>';
+      });
+      html+=foldCard('vm_rank_'+k, g.meta.name+' 模型命中率排名 <span class="tag">'+keys.length+' 模型</span>', kb, true);
+    }
+    // ===== 开奖核验详情（折叠，默认收起）=====
+    var db='';
+    if(!f.periods.length){ db='<div class="empty">反馈库尚未积累</div>'; }
+    f.periods.forEach(function(p){
+      db+='<div class="fb-box"><div class="fb-top"><span>第 '+p.period+' 期</span><span>实际: '+p.front.join(',')+(p.back?('+'+p.back.join(',')):'')+'</span></div>';
+      var hs=p.hits||{};
+      var hs6={};
+      Object.keys(hs).forEach(function(nm){ if(isKeep6(nm)){ var m6=map6(nm); hs6[m6]=Math.max(hs6[m6]||0, hs[nm]); } });
+      Object.keys(hs6).sort().forEach(function(nm){db+='<div class="'+modelColor(nm)+'">'+nm+': <b class="c-green">'+hs6[nm]+'</b> 命中</div>';});
+      db+='</div>';
+    });
+    html+=foldCard('vm_detail_'+k, g.meta.name+' 开奖核验详情 <span class="tag">已核验 '+f.periods.length+' 期</span>', db, false);
+  });
+  var el=$('tab-btverify');
+  el.innerHTML=el.innerHTML+html;
+}
+
+function toggleAboutCard(h){
+  var c=h.parentElement;
+  var collapsed=c.classList.toggle('collapsed');
+  try{ localStorage.setItem('about_collapse_'+c.dataset.k, collapsed?'1':'0'); }catch(e){}
+}
+function aboutCollapsed(k){
+  try{ return localStorage.getItem('about_collapse_'+k)==='1'; }catch(e){ return false; }
+}
+function aboutCard(k, title, bodyHtml, defOpen){
+  var collapsed = aboutCollapsed(k);
+  if(!collapsed) collapsed = !defOpen;
+  var caret = collapsed ? '\u25B8' : '\u25BE';
+  return '<div class="card about-card" data-k="'+k+'">'
+    + '<div class="about-card-h" onclick="toggleAboutCard(this)"><span class="about-caret">'+caret+'</span><h2>'+title+'</h2></div>'
+    + '<div class="about-card-b">'+bodyHtml+'</div></div>';
+}
+// v1.5.7 通用折叠卡片（回测核验/预测推荐栏复用）：k=唯一键 title=标题 bodyHtml=内容 defOpen=默认是否展开
+function foldCard(k, title, bodyHtml, defOpen){
+  var collapsed = aboutCollapsed('fc_'+k);
+  if(!collapsed) collapsed = !defOpen;
+  var caret = collapsed ? '\u25B8' : '\u25BE';
+  return '<div class="card about-card" data-k="fc_'+k+'">'
+    + '<div class="about-card-h" onclick="toggleAboutCard(this)"><span class="about-caret">'+caret+'</span><h2>'+title+'</h2></div>'
+    + '<div class="about-card-b">'+bodyHtml+'</div></div>';
+}
+function renderAbout(){
+  var s=DATA.system||{}, u=DATA.update||{};
+  var html='';
+  // —— 运行引擎（默认展开）——
+  var b1='';
+  if(HAS_NATIVE_BRIDGE){
+    try{
+      var ei=JSON.parse(AndroidBridge.getEngineInfo()||'{}');
+      var di=JSON.parse(AndroidBridge.getDeviceInfo()||'{}');
+      b1+='<div class="meta-item">引擎类型<b>AndroidBridge 原生引擎</b></div>';
+      b1+='<div class="meta-item">运行模式<b>独立离线版</b></div>';
+      b1+='<div class="meta-item">引擎版本<b class="c-gold">'+(ei.version||'1.0')+'</b></div>';
+      b1+='<div class="meta-item">应用版本<b class="c-gold">'+(AndroidBridge.getVersion()||'1.0')+'</b></div>';
+      b1+='<div class="meta-item">设备<b>'+(di.brand||'')+' '+(di.model||'')+'</b></div>';
+      b1+='<div class="meta-item">网络状态<b>'+(AndroidBridge.isNetworkAvailable()?'已连接':'离线')+'</b></div>';
+    }catch(e){
+      b1+='<div class="meta-item">引擎类型<b>AndroidBridge 原生引擎</b></div>';
+      b1+='<div class="meta-item">运行模式<b>独立离线版</b></div>';
+    }
+  } else {
+    b1+='<div class="meta-item">引擎类型<b>WebView 标准引擎</b></div>';
+    b1+='<div class="meta-item">运行模式<b>浏览器/PWA模式</b></div>';
+  }
+  html+=aboutCard('engine','运行引擎',b1,true);
+
+  // —— 如何更新数据（已并入“系统升级·联网同步”卡，避免重复）——
+
+  // —— 系统升级 · 联网同步（默认展开）——
+  var cfg=loadCfg();
+  var b4='';
+  var apkV='';
+      if(HAS_NATIVE_BRIDGE){ try{ apkV=AndroidBridge.getVersion()||''; }catch(e){} }
+      if(apkV && apkV.indexOf('v')!==0){ apkV='v'+apkV; }
+      b4+='<div class="about-line">内置数据版本 <b class="c-grad-gold">'+u.currentVersion+'</b>'+(apkV?' · APK版本 <span class="c-cyan">'+apkV+'</span>':'')+' · 数据更新 <span class="c-cyan">'+u.generated+'</span></div>';
+      if(apkV && u.currentVersion && apkV!==u.currentVersion){ b4+='<div class="note" style="color:#ffb74d">⚠ 检测到旧版APK（'+apkV+'），当前数据版本 '+u.currentVersion+'。为启用新功能建议重装最新APK（旧APK数据可正常使用）。</div>'; }
+  b4+='<div class="about-line">数据源：<b>'+(cfg.lastSyncSource==='remote'||cfg.lastSyncSource==='discover'?'远程同步':'内置')+'</b>'+(cfg.lastSync?'（最近同步 '+cfg.lastSync+'）':'')+'</div>';
+  b4+='<div class="note">联网同步：填入电脑端地址（同一WiFi），保存后打开即<b style="color:#7ee0a3;">全自动更新</b>；APK版会自动发现局域网服务器。</div>';
+  b4+='<input id="cfg-remote" type="text" placeholder="例: http://192.168.1.100:8000" value="'+cfg.remoteBase+'" onchange="var c=loadCfg();c.remoteBase=this.value.trim();saveCfg(c);" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin:6px 0;box-sizing:border-box;"/>';
+  b4+='<div class="sel-btns">';
+  b4+='<button class="sel-btn p" onclick="syncNow()">立即同步数据</button>';
+  b4+='<button class="sel-btn" onclick="triggerRealtimeUpdate()">🔄 触发电脑端更新</button>';
+  b4+='</div>';
+  b4+='<div id="rt-msg" class="note" style="margin-top:6px;"></div>';
+  b4+='<div class="toggle-row"><div><span class="lbl">后台自动同步（默认开启）</span><span class="desc">每5分钟自动检查+自动触发电脑端更新，有更新自动刷新</span></div><div class="switch2 '+(cfg.autoSync?'on':'')+'" onclick="toggleAutoSync(this)"></div></div>';
+  b4+='<div id="upd-msg" class="note"></div>';
+  html+=aboutCard('sync','系统升级 · 联网同步',b4,true);
+
+  // —— 10维研判 · 回测评估报告（默认折叠）——
+  var b10='';
+  b10+='<div class="about-line">回测方法：<b>大乐透最近300期 walk-forward</b>（每期只用当期之前历史，杜绝未来数据泄漏），与随机基线对照。</div>';
+  b10+='<div class="about-line">① 号码精确生成 ≈ 随机水平：3注最佳前区 1.36 vs 随机 1.37；3+1 达成率 1.0% vs 1.3%——<b class="c-gold">预测无法承诺命中</b>，理性看待。</div>';
+  b10+='<div class="about-line">② 已修复3个缺陷：3注同质化（覆盖 9→15 个号）、号码过度集中（23号占比13%→均衡抽样）、随机基线统计口径。</div>';
+  b10+='<div class="about-line">③ 多seed投票集成：900期实测无增益（3注最佳前区 1.26 &lt; 1.36），<b>不采用</b>，避免无意义复杂度。</div>';
+  b10+='<div class="about-line">④ 后区转移强化：900期实测无增益，后区微弱优势（+12%）来自大小结构约束（D7），已保留。</div>';
+  b10+='<div class="about-line">⑤ 评分参数敏感性：取 P1（近50期×0.8+全量×0.1+遗漏×0.2），≥3前区 3.3%→4.7%，3+1 达成 1.0%→2.0%。</div>';
+  b10+='<div class="about-line">⑥-补 结构画像硬约束组合票：实证不可行（D1_mode精确段分布与高分胆拖池冲突，单期探针0注产出），不采用，组合票保持现状。</div>';
+  b10+='<div class="about-line">⑦ 10维判断严谨化(质量感知)：每维度与理论随机基线对比算信号强度，弱信号退回理论、强信号加大约束。实证：D1精确段分布命中率仅0.3%(想当然主源)、D2最小号Top5命中57%(唯一强信号)、D7后区大小≈随机(79%期正确标弱)。落地后真随机900期: 3+1达成 1.1%→1.7%、≥3前区 3.8%→4.7%。</div>';
+  b10+='<div class="about-line">⑥ 多周期窗口自适应：900期×3种子实证 3注最佳前区 1.343→1.413（+5%），已落地（滚动验证选窗，无未来泄漏）。</div>';
+  b10+='<div class="note">开奖后自动核验已接入：每期回写 10维研判命中与权重（judge_10d_weights.json），下期自动应用。核心价值在结构画像与多样化覆盖，不在精确命中。</div>';
+  html+=aboutCard('bt10d','10维研判 · 回测评估报告',b10,false);
+
+  // —— 免责声明（默认折叠）——
+  var b5='';
+  b5+='<div class="note">彩票开奖相互独立，任何模型无法改变中奖概率。本系统用于统计学研究与吻合率追踪（回测选优、hold-out 防数据窥探、显著性检验），不构成投注建议，请理性购彩。</div>';
+  html+=aboutCard('disclaimer','免责声明',b5,false);
+
+  $('tab-about').innerHTML=html;
+}
+
+function show(t){
+  document.querySelectorAll('nav button').forEach(function(b){b.classList.toggle('on',b.dataset.t===t);});
+  if(t!=='select'){ SEL.fushiView=false; SEL.condMode=false; }
+  ['pred','judge10','select','hist','btverify','about'].forEach(function(x){
+    var el=$('tab-'+x); el.classList.toggle('on',x===t);
+    if(x==='pred'&&t==='pred')renderPred();
+    if(x==='judge10'&&t==='judge10')renderJudge10();
+    if(x==='select'&&t==='select')renderSelect();
+    if(x==='hist'&&t==='hist')renderHist();
+    if(x==='btverify'&&t==='btverify'){ renderBt(); renderVerify(); }
+    if(x==='about'&&t==='about')renderAbout();
+  });
+}
+document.querySelectorAll('nav button').forEach(function(b){b.onclick=function(){show(b.dataset.t);};});
+
+function bridgeHttp(method, url){
+  return new Promise(function(res, rej){
+    try{
+      var r = (method==='POST') ? AndroidBridge.httpPost(url) : AndroidBridge.httpGet(url);
+      if(r && r.indexOf('__KCYC_HTTP_OK__')===0){
+        var nl = r.indexOf('\n');
+        var body = (nl>=0)?r.substring(nl+1):'';
+        var status = parseInt(r.substring('__KCYC_HTTP_OK__'.length, nl>=0?nl:r.length),10)||200;
+        res({ok:status>=200&&status<300, status:status,
+             text:function(){ return Promise.resolve(body); },
+             json:function(){ return Promise.resolve(JSON.parse(body)); }});
+      } else if(r && r.indexOf('__KCYC_HTTP_ERR__')===0){
+        rej(new Error(r.substring('__KCYC_HTTP_ERR__'.length, 160)));
+      } else {
+        rej(new Error('bridge returned unknown response'));
+      }
+    }catch(e){ rej(e); }
+  });
+}
+function fetchWithTimeout(url, ms, opts){
+  opts = opts || {};
+  // APK 内优先走 AndroidBridge 原生 HTTP 通道（绕过 WebView 网络限制）
+  if(HAS_NATIVE_BRIDGE){
+    var _method = opts.method || 'GET';
+    var _resp = null, _ok = false;
+    try{
+      _resp = bridgeHttp(_method, url);
+      _ok = true;
+    }catch(e){}
+    if(_ok){
+      return Promise.race([
+        _resp,
+        new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||5000); })
+      ]).catch(function(e){
+        // 原生通道失败 → 回退标准 fetch
+        return Promise.race([
+          fetch(url,{cache:'no-store', method:_method}),
+          new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||5000); })
+        ]);
+      });
+    }
+  }
+  return Promise.race([
+    fetch(url,{cache:'no-store', method:opts.method||'GET'}),
+    new Promise(function(_,rej){ setTimeout(function(){ rej(new Error('timeout')); }, ms||5000); })
+  ]);
+}
+function loadCfg(){
+  var FIXED_BASE='https://pdk1976.github.io/lottery-data';
+  var def={remoteBase:FIXED_BASE, dataKey:'lottery_app_data_v2', lastSync:'', lastSyncSource:'', autoSync:true, autoInterval:60};
+  try{ var c=JSON.parse(localStorage.getItem('lottery_app_cfg_v2')); if(c){for(var k in def){if(c[k]!==undefined && k!=='remoteBase' && k!=='autoSync' && k!=='autoInterval')def[k]=c[k];}} }catch(e){}
+  def.remoteBase=FIXED_BASE; def.autoSync=true; def.autoInterval=60;
+  return def;
+}
+function saveCfg(c){ try{ localStorage.setItem('lottery_app_cfg_v2', JSON.stringify(c)); }catch(e){} }
+function loadData(){
+  if(typeof EMBEDDED_DATA!=='undefined'&&EMBEDDED_DATA){
+    // 内嵌模式：首屏秒开内置数据，同时后台自动检查同步（打开即自动更新）
+    setTimeout(function(){ autoSyncCheck(true); }, 800);
+    return Promise.resolve(EMBEDDED_DATA);
+  }
+  if(HAS_NATIVE_BRIDGE){
+    try{
+      var raw=AndroidBridge.readAssetFile('data/app_data.json');
+      if(raw&&raw.length>10){ return Promise.resolve(JSON.parse(raw)); }
+    }catch(e){}
+  }
+  var cfg=loadCfg();
+  var cached=null;
+  try{ cached=JSON.parse(localStorage.getItem(cfg.dataKey)); }catch(e){}
+  function fallback(){
+    if(cached) return cached;
+    if(window.__APP_DATA__) return window.__APP_DATA__;
+    return fetch('data/app_data.json').then(function(r){ if(!r.ok){throw new Error('HTTP '+r.status);} return r.json(); });
+  }
+  var _bases=[];
+  if(cfg.remoteBase){ _bases.push(cfg.remoteBase); }
+  try{ if(DATA&&DATA.update&&DATA.update.defaultRemote){ var _dr=DATA.update.defaultRemote; if(_dr&&_bases.indexOf(_dr)<0){ _bases.push(_dr); } } }catch(e){}
+  if(_bases.length){
+    var _bi=0;
+    function _tryNext(){
+      if(_bi>=_bases.length){ return fallback(); }
+      var _b=_bases[_bi++];
+      return fetchWithTimeout(_b.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 4000)
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(d){
+          try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+          cfg.remoteBase=_b; cfg.lastSync=d.generated||''; cfg.lastSyncSource='remote'; saveCfg(cfg);
+          return d;
+        })
+        .catch(function(){ return _tryNext(); });
+    }
+    return _tryNext();
+  }
+  return Promise.resolve().then(fallback);
+}
+function checkRemoteVersion(){
+  var cfg=loadCfg();
+  if(!cfg.remoteBase) return Promise.resolve(null);
+  return fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/version.json', 4000)
+    .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+    .catch(function(){ return null; });
+}
+// ===== 数据自动更新（后台轮询 + 前台唤醒）=====
+var _autoTimer=null;
+function showToast(msg, dur){
+  if(HAS_NATIVE_BRIDGE){ try{ AndroidBridge.toast(msg); }catch(e){} }
+  var t=document.getElementById('app-toast');
+  if(!t){ t=document.createElement('div'); t.id='app-toast'; t.className='toast'; document.body.appendChild(t); }
+  t.textContent=msg; t.classList.add('show');
+  clearTimeout(t._h); t._h=setTimeout(function(){ t.classList.remove('show'); }, dur||2500);
+}
+function autoDiscoverBases(){
+  // 同 WiFi 自动发现：通过 AndroidBridge 原生引擎并发扫描局域网 8000 端口
+  return new Promise(function(resolve){
+    if(!HAS_NATIVE_BRIDGE || !window.AndroidBridge || typeof AndroidBridge.discoverServer!=='function'){ resolve([]); return; }
+    var ips=[];
+    try{
+      var r=AndroidBridge.discoverServer(8000);
+      if(r && r.indexOf('OK|')===0){
+        var arr=r.substring(3).split(',');
+        for(var i=0;i<arr.length;i++){ var x=arr[i].trim(); if(x && ips.indexOf('http://'+x+':8000')<0){ ips.push('http://'+x+':8000'); } }
+      }
+    }catch(e){}
+    if(!ips.length){
+      try{
+        var lip=AndroidBridge.getLocalIp();
+        if(lip && lip!=='0.0.0.0'){ var pre=lip.substring(0, lip.lastIndexOf('.')+1); var gw=pre+'1'; if(lip!==gw){ ips.push('http://'+gw+':8000'); } }
+      }catch(e2){}
+    }
+    resolve(ips);
+  });
+}
+function autoSyncCheck(silent){
+  var cfg=loadCfg();
+  var _bases=[];
+  if(cfg.remoteBase){ _bases.push(cfg.remoteBase); }
+  try{ if(DATA&&DATA.update&&DATA.update.defaultRemote){ var _dr=DATA.update.defaultRemote; if(_dr&&_bases.indexOf(_dr)<0){ _bases.push(_dr); } } }catch(e){}
+  var _bi=0;
+  function _tryOne(){
+    if(_bi>=_bases.length){ return _tryDiscover(silent); }
+    var _b=_bases[_bi++];
+    return fetchWithTimeout(_b.replace(/\/$/,'')+'/version.json', 4000)
+      .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+      .then(function(v){
+        if(!v || !v.dataGenerated) return Promise.resolve(false);
+        var cur = (DATA && DATA.generated) ? DATA.generated : '';
+        // 服务器数据比当前新 → 自动拉取并刷新
+        if(v.dataGenerated !== cur){
+          return fetchWithTimeout(_b.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 6000)
+            .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+            .then(function(d){
+              try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+              cfg.remoteBase=_b; cfg.lastSync=d.generated||''; cfg.lastSyncSource='remote'; saveCfg(cfg);
+              DATA=d;
+              $('hd-sub').textContent='已自动同步 '+d.generated+' · 大乐透'+d.games.dlt.meta.latestPeriod+' / 双色球'+d.games.ssq.meta.latestPeriod;
+              try{ renderPred(); renderSelect(); renderHist(); renderFushi(); renderBt(); renderVerify(); renderAbout(); }catch(e){ try{console.error('render err',e);}catch(_e){} }
+              showToast('✓ 数据已自动更新至 '+d.generated, 3000);
+              return Promise.resolve(true);
+            });
+        }
+        return Promise.resolve(false);
+      })
+      .catch(function(){ return _tryOne(); });
+  }
+  function _tryDiscover(silent2){
+    return autoDiscoverBases().then(function(bases){
+      if(!bases.length){ if(!silent2)showToast('未找到局域网服务器，请确认电脑已启动数据服务且手机与电脑同一WiFi'); return Promise.reject(new Error('conn-fail')); }
+      var _di=0;
+      function _dTry(){
+        if(_di>=bases.length){ if(!silent2)showToast('自动同步失败：服务器未响应'); return Promise.reject(new Error('conn-fail')); }
+        var _b=bases[_di++];
+        return fetchWithTimeout(_b.replace(/\/$/,'')+'/version.json', 4000)
+          .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+          .then(function(v){
+            if(!v || !v.dataGenerated) return _dTry();
+            var cur = (DATA && DATA.generated) ? DATA.generated : '';
+            if(v.dataGenerated !== cur){
+              return fetchWithTimeout(_b.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 6000)
+                .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+                .then(function(d){
+                  try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+                  cfg.remoteBase=_b; cfg.lastSync=d.generated||''; cfg.lastSyncSource='discover'; saveCfg(cfg);
+                  DATA=d;
+                  $('hd-sub').textContent='已自动发现电脑服务器并同步 '+d.generated+' · 大乐透'+d.games.dlt.meta.latestPeriod+' / 双色球'+d.games.ssq.meta.latestPeriod;
+                  try{ renderPred(); renderSelect(); renderHist(); renderFushi(); renderBt(); renderVerify(); renderAbout(); }catch(e){ try{console.error('render err',e);}catch(_e){} }
+                  showToast('✓ 已自动连接电脑服务器，数据更新至 '+d.generated, 3000);
+                  return Promise.resolve(true);
+                });
+            }
+            return Promise.resolve(false);
+          })
+          .catch(function(){ return _dTry(); });
+      }
+      return _dTry();
+    });
+  }
+  return _tryOne();
+}
+
+// v1.5.7 全自动更新：无新数据可拉取（服务器数据=本地数据）但数据已过期（非今天生成）时，自动触发电脑端更新，完成后自动同步
+// 频率控制：距上次自动触发不足 3 小时则跳过（避免频繁触发电脑端全量运算）
+var _autoTrigKey='kcyc_autotrig';
+function autoTriggerUpdate(){
+  var cfg=loadCfg();
+  if(!cfg.remoteBase) return;
+  var last=0; try{ last=Number(localStorage.getItem(_autoTrigKey))||0; }catch(e){}
+  var now=Date.now();
+  if(now-last < 3*3600*1000) return;
+  fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/version.json', 4000)
+    .then(function(r){ if(!r.ok) throw new Error('HTTP '+r.status); return r.json(); })
+    .then(function(v){
+      if(!v||!v.dataGenerated) return;
+      var cur=(DATA&&DATA.generated)?DATA.generated:'';
+      if(v.dataGenerated!==cur) return;  // 服务器有新数据 → 交给 autoSyncCheck 拉取即可，无需触发
+      var genDate=new Date(v.dataGenerated.replace(' ','T'));
+      var today=new Date(); today.setHours(0,0,0,0);
+      if(!isNaN(genDate.getTime()) && genDate.getTime() >= today.getTime()) return;  // 今天已生成 → 最新，无需触发
+      try{ localStorage.setItem(_autoTrigKey, String(now)); }catch(e){}
+      // 静默提交电脑端更新（默认令牌 kcyc2026，局域网内使用）
+      fetchWithTimeout(cfg.remoteBase.replace(/\/$/,'')+'/update?token=kcyc2026&game=all', 15000, {method:'POST'})
+        .then(function(r){ return r.json(); })
+        .then(function(d){
+          if(d.status==='started'||d.status==='busy'){ pollUpdateStatus(null, 0); }
+          else if(d.status==='done'){ syncNowSilent(); }
+        })
+        .catch(function(){});
+    })
+    .catch(function(){});
+}
+
+// ===== 下拉刷新（v1.6.6 已取消：不再支持手势下拉更新，避免误触/卡顿；关于栏手动更新按钮保留）=====
+var ENABLE_PULL_REFRESH=false;
+var _pullStartY=0,_pullDist=0,_pulling=false;
+document.addEventListener('touchstart',function(e){
+  if(!ENABLE_PULL_REFRESH)return;
+  if(window.scrollY<=0){ _pullStartY=e.touches[0].clientY; _pulling=true; }
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  if(!_pulling)return;
+  _pullDist=e.touches[0].clientY-_pullStartY;
+  if(_pullDist>0&&_pullDist<120){
+    var pr=document.getElementById('pull-refresh');
+    var pt=document.getElementById('pr-text');
+    var arrow=pr.querySelector('.pr-arrow');
+    pr.style.height=_pullDist+'px';
+    if(_pullDist>60){ pt.textContent='释放更新'; arrow.style.transform='rotate(180deg)'; }
+    else { pt.textContent='下拉刷新'; arrow.style.transform='rotate(0deg)'; }
+  }
+},{passive:true});
+document.addEventListener('touchend',function(){
+  if(!_pulling)return; _pulling=false;
+  var pr=document.getElementById('pull-refresh');
+  if(_pullDist>60){
+    pr.style.height='40px';
+    document.getElementById('pr-text').textContent='正在更新...';
+    doSyncRefresh();
+  } else { pr.style.height='0'; }
+  _pullDist=0;
+});
+function doSyncRefresh(){
+  var cfg=loadCfg();
+  if(!cfg.remoteBase && !HAS_NATIVE_BRIDGE){
+    showToast('请先在「关于」页配置远程服务器地址');
+    document.getElementById('pull-refresh').style.height='0';
+    return;
+  }
+  showSyncProgress(30);
+  autoSyncCheck(false).then(function(ok){
+    showSyncProgress(100);
+    setTimeout(function(){ showSyncProgress(0); document.getElementById('pull-refresh').style.height='0'; },500);
+    if(ok) showToast('✓ 数据已更新到最新');
+    else showToast('已是最新数据或连接失败');
+  }).catch(function(){
+    showSyncProgress(0);
+    document.getElementById('pull-refresh').style.height='0';
+    showToast('更新失败：无法连接服务器');
+  });
+}
+function showSyncProgress(pct){
+  var bar=document.getElementById('sync-progress');
+  if(bar) bar.style.width=pct+'%';
+}
+
+function startAutoSync(){
+  stopAutoSync();
+  var cfg=loadCfg();
+  var _dr='';
+  try{ if(DATA&&DATA.update&&DATA.update.defaultRemote){ _dr=DATA.update.defaultRemote||''; } }catch(e){}
+  if(!cfg.autoSync || (!cfg.remoteBase && !_dr)) return;
+  var iv=(cfg.autoInterval||300)*1000;
+  _autoTimer=setInterval(function(){
+    autoSyncCheck(true);
+    autoTriggerUpdate();  // v1.5.7 全自动：数据过期时自动触发电脑端更新
+  }, iv);
+  // 页面从后台切回前台时立即检查一次
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState==='visible'){ autoSyncCheck(true); autoTriggerUpdate(); }
+  });
+  // v1.5.7 打开即自动检测一次触发更新（延迟，等页面渲染稳定）
+  setTimeout(function(){ autoTriggerUpdate(); }, 6000);
+}
+function stopAutoSync(){ if(_autoTimer){ clearInterval(_autoTimer); _autoTimer=null; } }
+function toggleAutoSync(el){
+  var cfg=loadCfg();
+  cfg.autoSync=!cfg.autoSync; saveCfg(cfg);
+  el.classList.toggle('on', cfg.autoSync);
+  if(cfg.autoSync){ startAutoSync(); showToast('✓ 自动同步已开启（每'+(cfg.autoInterval||300)+'秒检查）'); }
+  else{ stopAutoSync(); showToast('自动同步已关闭'); }
+}
+// ===== 自动更新结束 =====
+
+function saveCfgAndSync(){
+  var cfg=loadCfg();
+  var v=document.getElementById('cfg-remote').value.trim();
+  cfg.remoteBase=v; saveCfg(cfg);
+  var msg=document.getElementById('upd-msg');
+  if(!v){
+    // 未填地址 → 自动发现局域网服务器
+    autoDiscoverBases().then(function(bases){
+      if(!bases.length){ if(msg)msg.textContent='已清空远程地址。未发现局域网服务器，将使用内置数据；请确认电脑端已启动数据服务。'; return; }
+      var _b=bases[0];
+      return fetchWithTimeout(_b.replace(/\/$/,'')+'/version.json', 4000)
+        .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+        .then(function(vv){
+          if(!vv || !vv.dataGenerated) throw 0;
+          return fetchWithTimeout(_b.replace(/\/$/,'')+'/app_data.json?t='+Date.now(), 6000)
+            .then(function(r){ if(!r.ok) throw 0; return r.json(); })
+            .then(function(d){
+              try{ localStorage.setItem(cfg.dataKey, JSON.stringify(d)); }catch(e){}
+              cfg.remoteBase=_b; cfg.lastSync=d.generated||''; cfg.lastSyncSource='discover'; saveCfg(cfg);
+              DATA=d;
+              $('hd-sub').textContent='已自动发现服务器 '+_b+' · 数据 '+d.generated;
+              if(msg)msg.textContent='✓ 已自动发现并同步：'+_b+'（数据 '+d.generated+'）';
+              renderPred();
+            });
+        });
+    }).catch(function(){ if(msg)msg.textContent='自动发现失败：无法连接局域网服务器。'; });
+    return;
+  }
+  loadData().then(function(d){
+    DATA=d;
+    $('hd-sub').textContent='已联网同步 '+d.generated+' · 大乐透'+d.games.dlt.meta.latestPeriod+' / 双色球'+d.games.ssq.meta.latestPeriod;
+    if(msg)msg.textContent='\u2713 同步成功：数据更新至 '+d.generated+'（大乐透'+d.games.dlt.meta.latestPeriod+' / 双色球'+d.games.ssq.meta.latestPeriod+'）';
+    renderPred();
+  }).catch(function(){ if(msg)msg.textContent='\u2717 同步失败：无法连接 '+v+'，请确认电脑端已启动 serve_data.py 且手机与电脑同一WiFi。'; });
+}
+loadData().then(function(d){
+  DATA=d;
+  var _cfg=loadCfg();
+  var _src=(_cfg.lastSyncSource==='remote'?'已联网同步':'更新');
+  var _dot=(_cfg.autoSync&&_cfg.remoteBase)?'<span class=\'sync-dot\'></span>':'<span class=\'sync-dot off\'></span>';
+  var _syncInfo=_cfg.lastSync?(' · 同步 '+_cfg.lastSync.slice(5,16)):''; $('hd-sub').innerHTML=_dot+_src+' '+d.generated+_syncInfo+' · 大乐透'+d.games.dlt.meta.latestPeriod+' / 双色球'+d.games.ssq.meta.latestPeriod;
+  renderPred();
+  checkRemoteVersion().then(function(v){
+    if(v && DATA && DATA.update && v.version && v.version!==DATA.update.currentVersion){
+      var b=document.getElementById('upd-banner'); if(b)b.style.display='block';
+      var t=document.getElementById('upd-banner-text');
+      if(t)t.textContent='发现新版本 '+v.version+'（当前 '+DATA.update.currentVersion+'）· 数据已自动同步';
+    }
+  });
+  startAutoSync();
+}).catch(function(e){
+  $('hd-sub').textContent='数据加载失败：请通过 http 服务器访问或重新导出数据';
+  $('tab-pred').innerHTML='<div class="empty">无法加载 app_data.json（'+e.message+'）</div>';
+});
+
+// PWA 离线缓存（仅 https/localhost 生效，失败不影响使用）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
