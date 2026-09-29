@@ -460,7 +460,7 @@ function renderFushi(){
     $('tab-select').innerHTML=html; return;
   }
   html+='<div class="card"><h2><span class="c-grad-gold">复式选号</span> <span class="tag">'+f.period+'期</span></h2>';
-  html+='<div class="note" style="font-size:12px;">自动组合容错覆盖，注数与金额已算。'+f.src+'。</div>';
+  // html+='<div class="note" ... 自动组合容错覆盖 ...</div>';
   f.plans.forEach(function(p){
     var fballs=p.front.map(function(n){return '<span class="mball r">'+n+'</span>';}).join(' ');
     var bballs=p.back.map(function(n){return '<span class="mball b">'+n+'</span>';}).join(' ');
@@ -532,7 +532,7 @@ function renderSelect(){
   html+='<button class="sel-btn p" onclick="randomPick()">随机一注</button>';
   html+='<button class="sel-btn" onclick="resetSel(\''+SEL.game+'\')">清空</button>';
   html+='</div>';
-  html+='<div class="note" style="font-size:12px;">单式=基本数1注；复式=超出自动算注；胆拖=胆码+拖码组合自动算注。理性购彩。</div>';
+  // html+='<div class="note" ... 单式/复式/胆拖 ...</div>';
   // ===== 自设条件选号面板（升级版12项条件）=====
   if(SEL.condMode){
     html+='<div class="card"><h2>自设条件选号 <span class="tag">12项智能筛选</span></h2>';
@@ -983,7 +983,7 @@ function renderExternalReview(g){
   var overall=pk.overall_weight||0;
   var html='';
   var body='';
-  body+='<div class="note" style="line-height:1.55;margin-bottom:8px;">三大综合算法外部智囊团：研判数据包→外部模型回填→自动解析融合（当前权重 <b class="c-gold">'+Math.round(overall*100)+'%</b>），每期开奖后自动评估各方命中。</div>';
+  body+='<div class="note" style="line-height:1.55;margin-bottom:8px;">外部智囊团综合研判（当前权重 <b class="c-gold">'+Math.round(overall*100)+'%</b>）</div>';
   // 各方命中与权重
   var sNames={'doubao':'豆包(内置AI引擎)','deepseek':'DeepSeek','chatgpt':'ChatGPT'};
   var keys=Object.keys(srcs);
@@ -1569,7 +1569,7 @@ function renderAbout(){
       b4+='<div class="about-line">内置数据版本 <b class="c-grad-gold">'+u.currentVersion+'</b>'+(apkV?' · APK版本 <span class="c-cyan">'+apkV+'</span>':'')+' · 数据更新 <span class="c-cyan">'+u.generated+'</span></div>';
       if(apkV && u.currentVersion && apkV!==u.currentVersion){ b4+='<div class="note" style="color:#ffb74d">⚠ 检测到旧版APK（'+apkV+'），当前数据版本 '+u.currentVersion+'。为启用新功能建议重装最新APK（旧APK数据可正常使用）。</div>'; }
   b4+='<div class="about-line">数据源：<b>'+(cfg.lastSyncSource==='remote'||cfg.lastSyncSource==='discover'?'远程同步':'内置')+'</b>'+(cfg.lastSync?'（最近同步 '+cfg.lastSync+'）':'')+'</div>';
-  b4+='<div class="note">联网同步：填入电脑端地址（同一WiFi），保存后打开即<b style="color:#7ee0a3;">全自动更新</b>；APK版会自动发现局域网服务器。</div>';
+  b4+='<div class="note">填入电脑端地址（同一WiFi），保存后打开即自动更新</div>';
   b4+='<input id="cfg-remote" type="text" placeholder="例: http://192.168.1.100:8000" value="'+cfg.remoteBase+'" onchange="var c=loadCfg();c.remoteBase=this.value.trim();saveCfg(c);" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin:6px 0;box-sizing:border-box;"/>';
   b4+='<div class="sel-btns">';
   b4+='<button class="sel-btn p" onclick="syncNow()">立即同步数据</button>';
@@ -1591,12 +1591,12 @@ function renderAbout(){
   b10+='<div class="about-line">⑥-补 结构画像硬约束组合票：实证不可行（D1_mode精确段分布与高分胆拖池冲突，单期探针0注产出），不采用，组合票保持现状。</div>';
   b10+='<div class="about-line">⑦ 10维判断严谨化(质量感知)：每维度与理论随机基线对比算信号强度，弱信号退回理论、强信号加大约束。实证：D1精确段分布命中率仅0.3%(想当然主源)、D2最小号Top5命中57%(唯一强信号)、D7后区大小≈随机(79%期正确标弱)。落地后真随机900期: 3+1达成 1.1%→1.7%、≥3前区 3.8%→4.7%。</div>';
   b10+='<div class="about-line">⑥ 多周期窗口自适应：900期×3种子实证 3注最佳前区 1.343→1.413（+5%），已落地（滚动验证选窗，无未来泄漏）。</div>';
-  b10+='<div class="note">开奖后自动核验已接入：每期回写 10维研判命中与权重（judge_10d_weights.json），下期自动应用。核心价值在结构画像与多样化覆盖，不在精确命中。</div>';
+  b10+='<div class="note">开奖后自动核验，下期自动应用权重</div>';
   html+=aboutCard('bt10d','10维研判 · 回测评估报告',b10,false);
 
   // —— 免责声明（默认折叠）——
   var b5='';
-  b5+='<div class="note">彩票开奖相互独立，任何模型无法改变中奖概率。本系统用于统计学研究与吻合率追踪（回测选优、hold-out 防数据窥探、显著性检验），不构成投注建议，请理性购彩。</div>';
+  b5+='<div class="note">开奖独立随机，仅供研究参考，理性购彩</div>';
   html+=aboutCard('disclaimer','免责声明',b5,false);
 
   $('tab-about').innerHTML=html;
