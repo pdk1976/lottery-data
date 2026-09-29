@@ -1261,28 +1261,28 @@ function renderPred(){
           bArr.map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, #9cc0ff, #3f76e0 60%, #2a4fa8);box-shadow:0 2px 7px rgba(79,140,255,.35);">'+n+'</span>';}).join('')+'</div>';
       t3+='</div>';
     });
-    html+=foldCard('pred_t3', '各模型推荐<span class="tag">每模型1注</span>', t3, false);
-  }
-  // v1.6.8 融合大模型推荐：实际2注完整展示（融合主推 + 组A概率统计，前区+后区同一行）
-  var fu=g.fusion;
-  if(fu&&fu.groups){
-    var fb2='';
-    var _fused=[];
-    var mainF=fu.main||{};
-    if(mainF.front&&mainF.front.length){ _fused.push({tag:'注1 融合主推', f:mainF.front||[], b:mainF.back||[], col:'#34d399'}); }
-    var gpA=fu.groups['组A概率统计'];
-    if(gpA&&gpA[0]&&gpA[0].length){ _fused.push({tag:'注2 组A概率统计', f:gpA[0], b:gpA[1]||[], col:'#4fd8f0'}); }
-    _fused.forEach(function(z,zi){
-      fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;margin-top:'+(zi?8:0)+'px;">';
-      fb2+='<span style="flex:0 0 auto;font-size:11px;font-weight:700;color:'+z.col+';background:rgba(148,178,255,.08);border:1px solid '+z.col+'44;border-radius:8px;padding:2px 8px;margin-right:8px;">'+z.tag+'</span>';
-      fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;min-width:0;">'+
-           z.f.map(function(n){return '<span class="mball r" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+
-           '<span class="cplus" style="font-size:13px;">+</span>'+
-           z.b.map(function(n){return '<span class="mball b" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+'</div>';
-      fb2+='</div>';
-    });
-    if(_fused.length){ html+=foldCard('pred_fusion', '融合大模型推荐<span class="tag">'+(fu.target||'')+'期 2注</span>', fb2, false); }
-  }
+  // v1.7 精简：隐藏冗余块（各模型推荐/融合大模型/规律分析/全量扫描/权重榜），核心保留v3五模型组合
+  // html+=foldCard('pred_t3', '各模型推荐<span class="tag">每模型1注</span>', t3, false);
+  // v1.7 精简：隐藏融合大模型（与v3重复）
+  // var fu=g.fusion;
+  // if(fu&&fu.groups){
+  //   var fb2='';
+  //   var _fused=[];
+  //   var mainF=fu.main||{};
+  //   if(mainF.front&&mainF.front.length){ _fused.push({tag:'注1 融合主推', f:mainF.front||[], b:mainF.back||[], col:'#34d399'}); }
+  //   var gpA=fu.groups['组A概率统计'];
+  //   if(gpA&&gpA[0]&&gpA[0].length){ _fused.push({tag:'注2 组A概率统计', f:gpA[0], b:gpA[1]||[], col:'#4fd8f0'}); }
+  //   _fused.forEach(function(z,zi){
+  //     fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;margin-top:'+(zi?8:0)+'px;">';
+  //     fb2+='<span style="flex:0 0 auto;font-size:11px;font-weight:700;color:'+z.col+';background:rgba(148,178,255,.08);border:1px solid '+z.col+'44;border-radius:8px;padding:2px 8px;margin-right:8px;">'+z.tag+'</span>';
+  //     fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;min-width:0;">'+
+  //          z.f.map(function(n){return '<span class="mball r" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+
+  //          '<span class="cplus" style="font-size:13px;">+</span>'+
+  //          z.b.map(function(n){return '<span class="mball b" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+'</div>';
+  //     fb2+='</div>';
+  //   });
+  //   if(_fused.length){ html+=foldCard('pred_fusion', '融合大模型推荐<span class="tag">'+(fu.target||'')+'期 2注</span>', fb2, false); }
+  // }
   // v3 四模型去相关组合（热号/冷号/区间/共现）
   var v3=(app.v3_combo||{})[G];
   if(v3&&v3.models&&v3.models.length){
@@ -1343,22 +1343,23 @@ function renderPred(){
     }
     html+=foldCard('pred_exp', '经验规律模型<span class="tag">'+(ex.period||'')+'期 独立预测·与旧系统对比</span>', exb, true);
   }
-  html+=renderPatternCard(g);
-  html+=renderFullScan(g);
+  // v1.7 精简：隐藏规律分析/全量扫描/权重榜（核心保留v3五模型组合+外部研判）
+  // html+=renderPatternCard(g);
+  // html+=renderFullScan(g);
   html+=renderExternalReview(g);
-  var contrib=(p.contrib||[]).slice();
-  contrib.sort(function(a,b){return (b.weight||0)-(a.weight||0);});
-  var cwb='';
-  if(contrib.length){
-    contrib.forEach(function(it){
-      var hit=it.hit_avg!==null&&it.hit_avg!==undefined?('<span class="mstat">近5期命中 '+it.hit_avg+'球</span>'):'<span class="mstat">核验积累中</span>';
-      var wbar=Math.min(100, Math.round((it.weight||0)/2.5*100));
-      cwb+='<div class="cbar-row" style="border-bottom:1px dashed rgba(148,178,255,.1);padding:7px 0;"><span style="min-width:118px;font-size:11.5px;color:#c9d8f5;">'+it.name+'</span><div class="cbar-track" style="flex:1;margin:0 8px;"><div class="cbar-fill '+(it.weight>=1.1?'hi':(it.weight>=0.9?'mid':'lo'))+'" style="width:'+wbar+'%;min-width:26px;font-size:10px;">'+(it.weight||0).toFixed(2)+'</div></div>'+hit+'</div>';
-    });
-  } else {
-    cwb+='<div class="note" style="color:#8fa8d8;">等待下期预测生成</div>';
-  }
-  html+=foldCard('pred_contrib', '模型权重贡献榜<span class="tag">融合内部依据</span>', cwb, false);
+  // var contrib=(p.contrib||[]).slice();
+  // contrib.sort(function(a,b){return (b.weight||0)-(a.weight||0);});
+  // var cwb='';
+  // if(contrib.length){
+  //   contrib.forEach(function(it){
+  //     var hit=it.hit_avg!==null&&it.hit_avg!==undefined?('<span class="mstat">近5期命中 '+it.hit_avg+'球</span>'):'<span class="mstat">核验积累中</span>';
+  //     var wbar=Math.min(100, Math.round((it.weight||0)/2.5*100));
+  //     cwb+='<div class="cbar-row" style="border-bottom:1px dashed rgba(148,178,255,.1);padding:7px 0;"><span style="min-width:118px;font-size:11.5px;color:#c9d8f5;">'+it.name+'</span><div class="cbar-track" style="flex:1;margin:0 8px;"><div class="cbar-fill '+(it.weight>=1.1?'hi':(it.weight>=0.9?'mid':'lo'))+'" style="width:'+wbar+'%;min-width:26px;font-size:10px;">'+(it.weight||0).toFixed(2)+'</div></div>'+hit+'</div>';
+  //   });
+  // } else {
+  //   cwb+='<div class="note" style="color:#8fa8d8;">等待下期预测生成</div>';
+  // }
+  // html+=foldCard('pred_contrib', '模型权重贡献榜<span class="tag">融合内部依据</span>', cwb, false);
   $('tab-pred').innerHTML=html;
 }
 
