@@ -1395,44 +1395,52 @@ function renderVerify(){
   var html='';
   ['dlt','ssq'].forEach(function(k){
     var g=DATA.games[k], f=DATA.feedback[k]||{periods:[],summaries:{}};
-    // v7.2: 6综合模型白名单
-    var KEEP6=['贝叶斯','马尔可夫','LSTM','Transformer','时序','指数平滑','遗漏','统计特征','AI智能','梯度提升','GBDT','共现','智能集成','多源融合','DeepSeek','综合共识','AI综合融合','自适应引擎'];
-    function isKeep6(name){ for(var i=0;i<KEEP6.length;i++){ if(name.indexOf(KEEP6[i])>=0) return true; } return false; }
-    function map6(name){
-      if(name.indexOf('贝叶斯')>=0) return '①贝叶斯概率';
-      if(name.indexOf('马尔可夫')>=0) return '②马尔可夫转移';
-      if(name.indexOf('LSTM')>=0||name.indexOf('Transformer')>=0||name.indexOf('时序')>=0) return '③时序深度学习';
-      if(name.indexOf('指数平滑')>=0||name.indexOf('遗漏')>=0||name.indexOf('统计')>=0||name.indexOf('泊松')>=0||name.indexOf('频率')>=0) return '④统计特征';
-      if(name.indexOf('AI智能')>=0||name.indexOf('梯度提升')>=0||name.indexOf('GBDT')>=0||name.indexOf('共现')>=0||name.indexOf('智能集成')>=0||name.indexOf('相似')>=0||name.indexOf('FFT')>=0) return '⑤智能集成';
-      if(name.indexOf('多源融合')>=0||name.indexOf('DeepSeek')>=0||name.indexOf('综合共识')>=0||name.indexOf('AI综合融合')>=0||name.indexOf('融合')>=0) return '⑥多源融合';
-      if(name.indexOf('自适应引擎')>=0) return '自适应引擎(主推)';
-      return name;
+    // v1.7.6: 仅保留当前5个在用模型
+    var KEEP=[
+      {k:'统计规律模型', short:'①统计规律'},
+      {k:'深度时序模型', short:'②深度时序'},
+      {k:'机器学习集成', short:'③机器学习'},
+      {k:'多源融合大模型', short:'④融合大模型'},
+      {k:'自适应引擎', short:'★自适应引擎'}
+    ];
+    function mapModel(name){
+      for(var i=0;i<KEEP.length;i++){
+        if(name.indexOf(KEEP[i].k)>=0) return KEEP[i].short;
+      }
+      return null;
     }
     var sm6={};
-    Object.keys(f.summaries||{}).forEach(function(nm){ if(isKeep6(nm)){ var m6=map6(nm); if(!sm6[m6]) sm6[m6]={avg:0,count:0,total:0}; sm6[m6].avg+=f.summaries[nm].avg; sm6[m6].count++; sm6[m6].total+=f.summaries[nm].avg; } });
+    Object.keys(f.summaries||{}).forEach(function(nm){
+      var m=mapModel(nm);
+      if(m){
+        if(!sm6[m]) sm6[m]={avg:0,count:0,total:0};
+        sm6[m].avg+=f.summaries[nm].avg; sm6[m].count++; sm6[m].total+=f.summaries[nm].avg;
+      }
+    });
     Object.keys(sm6).forEach(function(m){ sm6[m].avg=sm6[m].total/sm6[m].count; });
     f={periods:f.periods, summaries:sm6};
     var sm=f.summaries;
     var keys=Object.keys(sm);
-    // 模型命中率排名
     if(keys.length){
       var kb='';
       var sorted=keys.sort(function(a,b){return sm[b].avg-sm[a].avg;});
       var maxv=Math.max.apply(null,sorted.map(function(n){return sm[n].avg;}));
       sorted.forEach(function(nm,i){
-        kb+='<div class="bar-row"><div class="nm" style="width:88px;text-align:left;font-size:11px;">'+nm+'</div><div class="bar-track"><div class="bar-fill'+(i===0?' top':'')+'" style="width:'+Math.max(12,sm[nm].avg/maxv*100)+'%">'+sm[nm].avg.toFixed(2)+'</div></div></div>';
+        kb+='<div class="bar-row"><div class="nm" style="width:96px;text-align:left;font-size:11px;">'+nm+'</div><div class="bar-track"><div class="bar-fill'+(i===0?' top':'')+'" style="width:'+Math.max(12,sm[nm].avg/maxv*100)+'%">'+sm[nm].avg.toFixed(2)+'</div></div></div>';
       });
       html+=foldCard('vm_rank_'+k, g.meta.name+' 模型排名<span class="tag">'+keys.length+'模型</span>', kb, true);
     }
-    // 开奖核验详情
     var db='';
     if(!f.periods.length){ db='<div class="empty">反馈库尚未积累</div>'; }
     f.periods.slice(-10).forEach(function(p){
       db+='<div class="fb-box"><div class="fb-top"><span>'+p.period+'期</span><span>'+p.front.join(',')+(p.back?('+'+p.back.join(',')):'')+'</span></div>';
       var hs=p.hits||{};
       var hs6={};
-      Object.keys(hs).forEach(function(nm){ if(isKeep6(nm)){ var m6=map6(nm); hs6[m6]=Math.max(hs6[m6]||0, hs[nm]); } });
-      Object.keys(hs6).sort().forEach(function(nm){db+='<div class="'+modelColor(nm)+'">'+nm+': <b class="c-green">'+hs6[nm]+'</b></div>';});
+      Object.keys(hs).forEach(function(nm){
+        var m=mapModel(nm);
+        if(m) hs6[m]=Math.max(hs6[m]||0, hs[nm]);
+      });
+      Object.keys(hs6).sort().forEach(function(nm){db+='<div>'+nm+': <b class="c-green">'+hs6[nm]+'</b></div>';});
       db+='</div>';
     });
     html+=foldCard('vm_detail_'+k, g.meta.name+' 开奖核验<span class="tag">近10期</span>', db, false);
