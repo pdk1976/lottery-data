@@ -1261,6 +1261,7 @@ function renderPred(){
           bArr.map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, #9cc0ff, #3f76e0 60%, #2a4fa8);box-shadow:0 2px 7px rgba(79,140,255,.35);">'+n+'</span>';}).join('')+'</div>';
       t3+='</div>';
     });
+  }
   // v1.7 精简：隐藏冗余块（各模型推荐/融合大模型/规律分析/全量扫描/权重榜），核心保留v3五模型组合
   // html+=foldCard('pred_t3', '各模型推荐<span class="tag">每模型1注</span>', t3, false);
   // v1.7 精简：隐藏融合大模型（与v3重复）
