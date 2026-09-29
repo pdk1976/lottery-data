@@ -1203,14 +1203,14 @@ function renderPred(){
   html+='<div class="meta-item">共识信号<b class="c-purple">'+(hc.length?hc.join(','):'无')+'</b></div>';
   html+='<div class="meta-item">反馈核验<b class="'+(main.meta&&main.meta.feedback?'c-green':'c-orange')+'">'+(main.meta&&main.meta.feedback?'已优化':'积累中')+'</b></div>';
   html+='</div>';
-  html+='<div class="note" style="margin-top:6px;font-size:12px;color:#8fa8d8;">'+p.latestPeriod+'期官方数据 · 全模型深度融合 · 动态权重 · DeepSeek AI研判</div>';
+  html+='<div class="note" style="margin-top:6px;font-size:11px;color:#8fa8d8;">'+p.latestPeriod+'期数据</div>';
   // v23.2 科学口径：单注命中精确概率分布（数学上限，诚实标注）
   var hd=p.hit_dist||{front:[],back:[]}, fn=hd.front||[], bn=hd.back||[];
   if(fn.length){
     var p0=fn[0]||0, p1=fn[1]||0, p2=fn[2]||0, p3=0;
     for(var hi=3;hi<fn.length;hi++){p3+=fn[hi]||0;}
     var b1=bn[1]||0, b2=bn[2]||0, p31=p3*b1/100+(b2?p3*b2/10000:0);
-    html+='<div class="note" style="margin-top:4px;font-size:11px;color:#8fa8d8;">科学口径：单注命中≥3球概率约 <b>'+p3.toFixed(2)+'%</b>（3+1约 '+p31.toFixed(2)+'%），开奖独立随机，理性购彩。</div>';
+    // html+='<div class="note" ... 科学口径 ...</div>';
   }
   if(main.meta){
     var m=main.meta, mc=m.mabCounts||{}, order=['A全量Top','B全量冷','C30冷','D10热','E区间均衡'];
@@ -1227,7 +1227,7 @@ function renderPred(){
     var cvb='';
     var bt=cov.backtest_10||{};
     if(bt['期数']){
-      cvb+='<div class="note" style="font-size:11.5px;color:#c9d8f5;line-height:1.6;">诚实回测(近'+bt['期数']+'期·10注)：单注均红 系统<b class="c-cyan">'+bt['系统单注均红']+'</b> vs 随机'+bt['随机单注均红']+' | 最佳注≥3红 系统'+bt['系统最佳注≥3红']+'% vs 随机'+bt['随机最佳注≥3红']+'% | 单注蓝球 系统'+bt['系统单注蓝球命中']+'% vs 随机'+bt['随机单注蓝球命中']+'%</div>';
+      cvb+='<div class="note" style="font-size:11px;color:#c9d8f5;line-height:1.5;">近'+bt['期数']+'期回测：单注均红 <b class="c-cyan">'+bt['系统单注均红']+'</b> vs 随机'+bt['随机单注均红']+' · ≥3红 '+bt['系统最佳注≥3红']+'% vs '+bt['随机最佳注≥3红']+'%</div>';
     }
     // v1.7.7：仅精选3注（取覆盖率最高方案的前3注），不再全量展示
     var _bestNk='15'; if(cov.plans['10']) _bestNk='10'; if(cov.plans['8']) _bestNk='8';
@@ -1287,7 +1287,7 @@ function renderPred(){
   var v3=(app.v3_combo||{})[G];
   if(v3&&v3.models&&v3.models.length){
     var v3h='';
-    v3h+='<div class="note" style="font-size:12px;color:#c9d8f5;line-height:1.7;margin-bottom:6px;">基于2929期历史数据·4模型评分排序·形态硬约束·去相关≤3重叠</div>';
+    v3h+='<div class="note" style="font-size:11px;color:#c9d8f5;margin-bottom:6px;">5模型去相关覆盖</div>';
     v3.models.forEach(function(m,mi){
       v3h+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#f0b24a,#e08a1e);">'+(mi+1)+'</span>';
       v3h+='<span style="font-size:11px;font-weight:700;color:#f0b24a;margin-right:6px;min-width:60px;">'+m.name+'</span>';
@@ -1302,32 +1302,6 @@ function renderPred(){
   var ex=g.exp_model;
   if(ex&&ex.tickets&&ex.tickets.length){
     var exb='';
-    var st=ex.structure||{};
-    exb+='<div class="note" style="font-size:12px;color:#c9d8f5;line-height:1.7;">';
-    exb+='<span class="c-gold">结构预测：</span>必带数字 <b class="c-cyan">'+(st.must_digits||[]).join(',')+'</b> · 连号 <b>'+(st.lian_yes?'是':'否')+'</b>('+(st.lian_prob||0)+'%)';
-    if(st.zone_n){
-      var zn=st.zone_n||[], zt=(G==='dlt'?['1-9','10-19','20-29','30-35']:['1-9','10-19','20-29','30-33']);
-      exb+=' · 各段 '+zn.map(function(c,i){return zt[i]+'段'+c+'个';}).join('/');
-    }
-    exb+=' · 最小号≈'+(st.front_min||'-');
-    if(st.back_struct){
-      var bk2='';
-      for(var kb in st.back_struct){ if(typeof st.back_struct[kb]==='number'){bk2+=' '+(kb==='small'?'小号':(kb==='big'?'大号':kb))+' '+Math.round(st.back_struct[kb]*100)+'%'; } }
-      exb+='<br/>后区：'+bk2+' · 与前区重号'+(st.overlap_prob||0)+'%';
-    }
-    // v1.6.5+ 扩展参数（豆包+DeepSeek综合新增）
-    var ext='';
-    if(st.sum_band){ ext+='<span class="c-gold">和值带</span>'+st.sum_band[0]+'-'+st.sum_band[1]+'(中枢'+(st.sum_center||'-')+')'; }
-    if(st.span_band){ ext+=' · <span class="c-gold">跨度</span>'+st.span_band[0]+'-'+st.span_band[1]; }
-    if(st.odd_even){ ext+=' · <span class="c-gold">奇偶</span>'+st.odd_even; }
-    if(st.repeat_front!=null){ ext+=' · <span class="c-gold">重号</span>≤'+(st.repeat_front+1); }
-    if(st.hot_cold&&st.hot_cold.target){ ext+=' · <span class="c-gold">冷热</span>'+st.hot_cold.target; }
-    if(st.back_omit&&st.back_omit.length){ ext+=' · <span class="c-gold">后区遗漏≥12</span>'+st.back_omit.join(','); }
-    if(st.zone_flow){ ext+=' · <span class="c-gold">区流</span>'+st.zone_flow.join(','); }
-    if(st.sum_delta){ ext+=' · <span class="c-gold">和值差</span>≤'+st.sum_delta[1]; }
-    if(st.back_repeat!=null){ ext+=' · <span class="c-gold">后区无重号</span>'+st.back_repeat+'%'; }
-    if(ext){ exb+='<br/><span style="color:#4fd8f0;">扩展：</span>'+ext; }
-    exb+='</div>';
     (ex.tickets||[]).slice(0,3).forEach(function(t,ti){
       exb+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#7c5cff,#4fd8f0);">'+(ti+1)+'</span>'+
            t.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+
@@ -1338,7 +1312,7 @@ function renderPred(){
       var _mpf=Array.isArray(ex.main_pick)?(ex.main_pick[0]||[]):(ex.main_pick.front||[]);
       var _mpb=Array.isArray(ex.main_pick)?(ex.main_pick[1]||[]):(ex.main_pick.back||[]);
       if(_mpf.length){
-        exb+='<div class="note" style="margin-top:6px;font-size:12px;color:#8fa8d8;">★ 主推：'+_mpf.join(',')+'+'+_mpb.join(',')+'（开奖后与旧系统并列核验对比，见回测核验栏）</div>';
+        exb+='<div class="note" style="margin-top:6px;font-size:11px;color:#8fa8d8;">★ 主推：'+_mpf.join(',')+'+'+_mpb.join(',')+'</div>';
       }
     }
     html+=foldCard('pred_exp', '经验规律模型<span class="tag">'+(ex.period||'')+'期 独立预测·与旧系统对比</span>', exb, true);
