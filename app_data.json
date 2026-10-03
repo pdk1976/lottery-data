@@ -8948,7 +8948,15 @@
           ],
           "back": 11,
           "hits": {},
-          "note": "自动补录，待核验"
+          "note": "自动补录，待核验",
+          "blue_check": {},
+          "combo3_check": {
+            "tickets": [],
+            "t31_any": false,
+            "t31_tickets": [],
+            "union_front_hit": [],
+            "union_back_hit": []
+          }
         }
       ],
       "summaries": {
