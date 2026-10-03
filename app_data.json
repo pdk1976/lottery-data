@@ -13836,6 +13836,22 @@
       "ssq_red_expected": 1.0909,
       "ssq_blue_expected": 0.0625,
       "note": "随机选号基准：我们的模型长期超过这个值就算有效"
+    },
+    "verification": {
+      "random_baseline": {
+        "dlt_front": 0.7143,
+        "dlt_back": 0.3333,
+        "ssq_red": 1.0909,
+        "ssq_blue": 0.0625
+      },
+      "rules": [
+        "连续10期超过随机 = 模型有效",
+        "连续10期不如随机 = 方向错了",
+        "贝叶斯动态权重每期自动更新"
+      ],
+      "history_count": 0,
+      "avg_front_hit": 0,
+      "vs_baseline": "待验证"
     }
   }
 }
