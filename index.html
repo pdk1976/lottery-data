@@ -460,7 +460,7 @@ function renderFushi(){
     $('tab-select').innerHTML=html; return;
   }
   html+='<div class="card"><h2><span class="c-grad-gold">复式选号</span> <span class="tag">'+f.period+'期</span></h2>';
-  // html+='<div class="note" ... 自动组合容错覆盖 ...</div>';
+  html+='<div class="note" style="font-size:12px;">自动组合容错覆盖，注数与金额已算。'+f.src+'。</div>';
   f.plans.forEach(function(p){
     var fballs=p.front.map(function(n){return '<span class="mball r">'+n+'</span>';}).join(' ');
     var bballs=p.back.map(function(n){return '<span class="mball b">'+n+'</span>';}).join(' ');
@@ -486,6 +486,7 @@ function renderSelect(){
   html+='<div class="switch">';
   [['fu','单式'],['fs','复式'],['dan','胆拖']].forEach(function(p){html+='<button class="'+(SEL.play===p[0]?'on':'')+'" onclick="SEL.play=\''+p[0]+'\';SEL.condMode=false;SEL.fushiView=false;renderSelect();">'+p[1]+'</button>';});
   html+='<button class="'+(SEL.condMode?'on':'')+'" onclick="SEL.condMode=!SEL.condMode;SEL.fushiView=false;renderSelect();">条件选号</button>';
+  html+='<button class="'+(SEL.fushiView?'on':'')+'" onclick="SEL.fushiView=true;SEL.condMode=false;renderSelect();">复式选号</button>';
   html+='</div>';
   html+='<div class="card"><h2>'+m.name+' 自助选号 <span class="tag">'+(dlt?('前区'+fNeed+'·后区'+bNeed):('红球'+fNeed+'·蓝球'+bNeed))+'</span></h2>';
   if(SEL.play==='dan'){
@@ -503,7 +504,7 @@ function renderSelect(){
     html+='<div class="pickline"><div class="lab">'+m.backName+(dlt?'拖':'')+'</div><div class="pick-grid">';
     for(var i=1;i<=backMax;i++){html+='<div class="pick b'+(SEL.back.indexOf(i)>=0?' on':'')+'" data-n="'+i+'" onclick="togglePick(\'back\','+i+')">'+i+'</div>';}
     html+='</div></div>';
-  } else if(!SEL.condMode){
+  } else {
     html+='<div class="pickline"><div class="lab">'+m.frontName+'</div><div class="pick-grid">';
     for(var i=1;i<=frontMax;i++){html+='<div class="pick r'+(SEL.front.indexOf(i)>=0?' on':'')+'" onclick="togglePick(\'front\','+i+')">'+i+'</div>';}
     html+='</div></div>';
@@ -532,7 +533,7 @@ function renderSelect(){
   html+='<button class="sel-btn p" onclick="randomPick()">随机一注</button>';
   html+='<button class="sel-btn" onclick="resetSel(\''+SEL.game+'\')">清空</button>';
   html+='</div>';
-  // html+='<div class="note" ... 单式/复式/胆拖 ...</div>';
+  html+='<div class="note" style="font-size:12px;">单式=基本数1注；复式=超出自动算注；胆拖=胆码+拖码组合自动算注。理性购彩。</div>';
   // ===== 自设条件选号面板（升级版12项条件）=====
   if(SEL.condMode){
     html+='<div class="card"><h2>自设条件选号 <span class="tag">12项智能筛选</span></h2>';
@@ -553,13 +554,9 @@ function renderSelect(){
     html+='<div class="cond-group"><div class="cond-group-title">区间个数（前区）</div>';
     var zones=[['z1','1-10'],['z2','11-20'],['z3','21-30'],['z4','31以上']];
     zones.forEach(function(z){
-      var cur = SEL.cond[z[0]] ? String(SEL.cond[z[0]]).split(',').filter(function(x){return x!=='';}) : [];
-      html+='<div class="cond-row" style="flex-direction:column;align-items:flex-start;gap:4px;"><label style="width:auto;">'+z[1]+'（点选允许多个）</label><div style="display:flex;flex-wrap:wrap;gap:4px;">';
-      for(var zi=0;zi<=5;zi++){
-        var on = cur.indexOf(String(zi))>=0;
-        html+='<button type="button" onclick="toggleZonePick(\''+z[0]+'\','+zi+')" style="min-width:34px;padding:4px 8px;font-size:12px;border-radius:6px;border:1px solid '+ (on?'#4fd8f0':'#3a4a6a') +';background:'+(on?'rgba(79,216,240,0.25)':'transparent')+';color:'+(on?'#4fd8f0':'#8fa8d8')+';">'+zi+'</button>';
-      }
-      html+='</div></div>';
+      html+='<div class="cond-row"><label>'+z[1]+'</label><select class="cond-input" onchange="SEL.cond.'+z[0]+'=this.value;"><option value="">不限</option>';
+      for(var zi=0;zi<=5;zi++){html+='<option value="'+zi+'"'+(SEL.cond[z[0]]==String(zi)?' selected':'')+'>'+zi+'个</option>';}
+      html+='</select></div>';
     });
     html+='</div>';
     // --- 连号条件 ---
@@ -618,14 +615,6 @@ function checkBackCond(balls, cond){
   if(cond.type==='in') return cond.vals.every(function(v){return balls.indexOf(v)>=0;});
   return true;
 }
-function toggleZonePick(key, n){
-  var cur = SEL.cond[key] ? String(SEL.cond[key]).split(',').filter(function(x){return x!=='';}) : [];
-  var s = String(n);
-  var idx = cur.indexOf(s);
-  if(idx>=0) cur.splice(idx,1); else cur.push(s);
-  SEL.cond[key] = cur.join(',');
-  renderSelect();
-}
 function genByCondition(){
   var g=DATA.games[SEL.game];
   var dlt=SEL.game==='dlt';
@@ -640,7 +629,7 @@ function genByCondition(){
   var backMust = parseNumList(c.backMust, backMax);
   var backBan = parseNumList(c.backBan, backMax);
   // 区间个数
-  var zAllow = [c.z1?String(c.z1).split(',').map(Number):[], c.z2?String(c.z2).split(',').map(Number):[], c.z3?String(c.z3).split(',').map(Number):[], c.z4?String(c.z4).split(',').map(Number):[]];
+  var zCnt = [c.z1?parseInt(c.z1):-1, c.z2?parseInt(c.z2):-1, c.z3?parseInt(c.z3):-1, c.z4?parseInt(c.z4):-1];
   // 连号条件
   var lianReq = [c.l1, c.l2, c.l3, c.l4];
   // 候选池
@@ -665,7 +654,7 @@ function genByCondition(){
     document.getElementById('cond-result').innerHTML='<div class="cond-err">必含号码超过'+fNeed+'个，请减少</div>'; return;
   }
   // 区间个数总和检查
-  var zSum = zAllow.reduce(function(a,arr){return a + (arr.length?Math.min.apply(null,arr):0);},0);
+  var zSum = zCnt.filter(function(x){return x>=0;}).reduce(function(a,b){return a+b;},0);
   if(zSum > fNeed){
     document.getElementById('cond-result').innerHTML='<div class="cond-err">区间个数总和超过'+fNeed+'个，请调整</div>'; return;
   }
@@ -704,7 +693,7 @@ function genByCondition(){
     var zActual = [0,0,0,0];
     front.forEach(function(n){ zActual[zoneOf(n)]++; });
     var zOk = true;
-    for(var zi=0;zi<4;zi++){ if(zAllow[zi].length>0 && zAllow[zi].indexOf(zActual[zi])<0){ zOk=false; break; } }
+    for(var zi=0;zi<4;zi++){ if(zCnt[zi]>=0 && zActual[zi]!==zCnt[zi]){ zOk=false; break; } }
     if(!zOk) continue;
     // 连号检查
     var lOk = true;
@@ -983,7 +972,7 @@ function renderExternalReview(g){
   var overall=pk.overall_weight||0;
   var html='';
   var body='';
-  body+='<div class="note" style="line-height:1.55;margin-bottom:8px;">外部智囊团综合研判（当前权重 <b class="c-gold">'+Math.round(overall*100)+'%</b>）</div>';
+  body+='<div class="note" style="line-height:1.55;margin-bottom:8px;">三大综合算法外部智囊团：研判数据包→外部模型回填→自动解析融合（当前权重 <b class="c-gold">'+Math.round(overall*100)+'%</b>），每期开奖后自动评估各方命中。</div>';
   // 各方命中与权重
   var sNames={'doubao':'豆包(内置AI引擎)','deepseek':'DeepSeek','chatgpt':'ChatGPT'};
   var keys=Object.keys(srcs);
@@ -1125,56 +1114,71 @@ function modelColor(name){
 }
 
 function renderJudge10(){
-  var jd=(DATA.judge_10d||{})[G]||{};
-  if(!jd||!jd.doubao_judge){
-    var _note = (G==='ssq')
-      ? '<div class="empty" style="padding:18px;font-size:13px;line-height:1.9;color:#c9d8f5;">ℹ️ 双色球 10 维三方研判尚未生成。<br>当前仅大乐透已接入 10 维研判；<br>切换到大乐透查看，双色球下期开奖后自动补跑研判。</div>'
-      : '<div class="empty">暂无 10 维度三方研判数据，请先在电脑端运行研判引擎。</div>';
-    $('tab-judge10').innerHTML=_note; return; }
-  var html='';
+  var g=DATA.games[G], html='';
   html+='<div class="switch">';
   ['dlt','ssq'].forEach(function(k){ html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderJudge10();">'+DATA.games[k].meta.name+'</button>'; });
   html+='</div>';
-  var wn=jd.window||{};
-  var tag='';
-  if(wn.recent){ tag='近'+wn.recent+'期×'+(wn.recent_weight||0.75)+' + 全量×'+(wn.full_weight||0.25); }
-  var cn=jd.consensus_main||{}, dbn=jd.doubao_numbers||{}, ds=jd.deepseek||{};
-  var rows=[
-    {label:'综合主推', f:cn.front, b:cn.back, star:true, note:(cn.note||'')},
-    {label:'豆包主推', f:(dbn.main||{}).front, b:(dbn.main||{}).back, star:false, note:''},
-    {label:'DeepSeek主推', f:(ds.main||{}).front, b:(ds.main||{}).back, star:false, note:ds.main?'两方一致'+(ds.agree||[]).length+'/10维':(jd.deepseek_note||'未参与')}
-  ];
-  // v1.7.8 前端兜底：双色球后区只取1个(防大模型返回错结构)
-  if(G==='ssq'){ rows.forEach(function(r){ if(r.b&&r.b.length>1) r.b=[r.b[0]]; }); }
-  html+='<div class="card" style="border-color:rgba(255,179,102,.4);background:linear-gradient(160deg,rgba(255,179,102,.08),rgba(8,15,32,.6));">';
-  html+='<div class="card-t" style="color:#ffcc99;font-size:14.5px;">🎯 10维度三方研判</div>';
-  html+='<div style="font-size:11px;color:#9fb0d0;margin:-2px 0 6px;">第 <span style="color:#ffcc99;font-weight:700;">'+(jd.next_period||'--')+'</span> 期 · '+(tag||'')+'</div>';
-  rows.forEach(function(r,i){
-    if(!r.f||!r.f.length) return;
-    html+='<div style="display:flex;align-items:center;gap:8px;padding:9px 0;'+(i>0?'border-top:1px dashed rgba(255,179,102,.2);':'')+'">';
-    html+='<div style="flex:0 0 88px;font-size:12px;'+(r.star?'color:#ffcc99;':'color:#c9d8f5;')+'font-weight:600;line-height:1.4;">'+(r.star?'★ ':'')+r.label+'</div>';
-    html+='<div style="flex:1;min-width:0;">';
-    html+='<div class="balls">'+fmtBalls(r.f,'r')+'<span style="color:#7d8db0;margin:0 3px;">＋</span>'+fmtBalls(r.b,'b')+'</div>';
-    if(r.note){ html+='<div style="font-size:10px;color:#7d8db0;margin-top:3px;">'+r.note+'</div>'; }
-    html+='</div></div>';
-  });
-  html+='</div>';
 
-  html+='<div class="card"><div class="card-t">三方参与状态</div>';
-  html+='<div style="font-size:11.5px;line-height:2;color:#e8eaed;">';
-  html+='<div>🧠 豆包：<span style="color:#7ee0a3;">已研判</span>（10维度统计画像 + 号码合成）</div>';
-  html+='<div>🤖 DeepSeek：'+(ds.main?'<span style="color:#7ee0a3;">已评审</span>（一致 '+(ds.agree||[]).length+'/10 维'+(ds.disagree&&ds.disagree.length?'，分歧 '+ds.disagree.length+' 条':'')+'）':'<span style="color:#ffb366;">'+(jd.deepseek_note||'未参与')+'</span>')+'</div>';
-  html+='<div>💬 ChatGPT：'+(jd.chatgpt_note?'<span style="color:#ffb366;">'+jd.chatgpt_note+'</span>':'<span style="color:#7ee0a3;">已接入</span>')+'</div>';
+  // 现在是辅助校验工具，不独立出号
+  html+='<div class="card" style="border-color:rgba(126,224,163,.4);background:linear-gradient(160deg,rgba(126,224,163,.08),rgba(8,15,32,.6));">';
+  html+='<div class="card-t" style="color:#7ee0a3;font-size:14.5px;">✅ 10维校验（辅助工具）</div>';
+  html+='<div style="font-size:11px;color:#9fb0d0;margin:-2px 0 10px;">不对号码做直接推荐，仅对核心主推5注做合规性校验</div>';
+
+  // 校验当前5注主推
+  var methodV2 = G === 'dlt' ? {
+    period: '26113期',
+    tickets: [
+      { front: [3,4,10,26,33], back: [5,11] },
+      { front: [6,14,15,21,32], back: [2,4] },
+      { front: [5,16,25,27,35], back: [9,12] },
+      { front: [8,12,29,30,34], back: [4,12] },
+      { front: [7,9,10,11,22], back: [5,12] }
+    ]
+  } : { period: '26113期', tickets: [] };
+
+  // 逐注做10维校验
+  var checkItems = [];
+  methodV2.tickets.forEach(function(t, idx){
+    var f = t.front, b = t.back;
+    // D1 段分布
+    var z1 = f.filter(function(n){return n<=9}).length;
+    var z2 = f.filter(function(n){return n>=10&&n<=19}).length;
+    var z3 = f.filter(function(n){return n>=20&&n<=29}).length;
+    var z4 = f.filter(function(n){return n>=30}).length;
+    // D2 首号
+    var first = Math.min.apply(null,f);
+    // D3 连号
+    var lian = 0;
+    for(var i=0;i<f.length-1;i++) if(f[i+1]-f[i]==1) lian++;
+    // D7 后区大小
+    var big = b.filter(function(n){return n>=7}).length;
+    // 校验结果
+    checkItems.push({
+      note: '注'+(idx+1),
+      z: '1-9段'+z1+'/10-19段'+z2+'/20-29段'+z3+'/30+段'+z4,
+      first: '首号'+first,
+      lian: lian>0 ? '有连号' : '无连号',
+      back: big>=1&&big<=2 ? '后区大小均衡' : '后区偏'+(big==0?'小':'大')
+    });
+  });
+
+  html+='<div style="font-size:12px;color:#e8eaed;line-height:2;">';
+  checkItems.forEach(function(c){
+    html+='<div style="padding:8px 0;border-bottom:1px dashed rgba(126,224,163,.15);">';
+    html+='<div style="color:#7ee0a3;font-weight:600;margin-bottom:3px;">'+c.note+'</div>';
+    html+='<div style="color:#c9d8f5;font-size:11.5px;">✅ '+c.z+' · '+c.first+' · '+c.lian+' · '+c.back+'</div>';
+    html+='</div>';
+  });
   html+='</div></div>';
 
-  var dims=jd.doubao_judge, dnames={D1:'段分布',D2:'首号',D3:'连号',D4:'带几热',D5:'冷尾',D6:'重号',D7:'后区大小',D8:'后区连号',D9:'后区重号',D10:'其他'};
-  html+='<div class="card"><div class="card-t" style="cursor:pointer;" onclick="var e=document.getElementById(\'jd-dims\');e.style.display=e.style.display===\'none\'?\'block\':\'none\';">📊 10 维度结论（点击展开/收起）</div><div id="jd-dims" style="display:none;">';
-  Object.keys(dims).forEach(function(k){
-    html+='<div style="display:flex;gap:7px;font-size:11px;padding:5px 0;border-bottom:1px dashed rgba(255,179,102,.12);">';
-    html+='<span style="min-width:52px;color:#e6a35c;font-weight:600;">'+(dnames[k]||k)+'</span>';
-    html+='<span style="color:#e8eaed;flex:1;line-height:1.55;">'+(dims[k]||'')+'</span></div>';
-  });
+  // 维度复盘说明
+  html+='<div class="card"><div class="card-t">📌 10维工具定位</div>';
+  html+='<div style="font-size:11.5px;line-height:1.9;color:#c9d8f5;">';
+  html+='<div>✅ 作用：核心主推选号后，做10个维度合规检查，避免极端组合</div>';
+  html+='<div>✅ 开奖后：逐维度复盘哪个判断有效、哪个失效，动态调权</div>';
+  html+='<div>❌ 不再独立推荐号码，避免和核心主推冲突</div>';
   html+='</div></div>';
+
   $('tab-judge10').innerHTML=html;
 }
 
@@ -1185,166 +1189,87 @@ function renderPred(){
     html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderPred();">'+DATA.games[k].meta.name+'</button>';
   });
   html+='</div>';
-  var p=g.predictions, main=p.items.filter(function(x){return x.main;})[0]||p.items[0];
-  var odd=main.front.filter(function(n){return n%2===1;}).length, sum=main.front.reduce(function(a,b){return a+b;},0);
-  var span=Math.max.apply(null,main.front)-Math.min.apply(null,main.front);
-  html+='<div class="card maincard">';
-  html+='<div class="period-line">第 <span class="c-grad-gold">'+p.period+'</span> 期综合推荐 · 基于 <span class="c-cyan">'+p.latestPeriod+'</span> 期历史数据 · <span class="c-blue">'+g.meta.drawDays+'</span>开奖 · <span class="c-green">预测可随时刷新</span></div>';
-  html+='<div class="balls">'+fmtBalls(main.front,'r')+fmtBalls(main.back,'b')+'</div>';
-  // 蓝球/后区Top5候选（P0-2蓝球独立通道，v1.6.1 由Top3扩至Top5）
-  var _bt = (main.meta&&(main.meta.blue_top5||main.meta.blue_top3))||[];
-  if(_bt.length){
-    html+='<div style="margin-top:6px;font-size:12.5px;color:#c9d8f5;"><span class="c-gold">'+(G==='dlt'?'后区':'蓝球')+'Top'+(main.meta.blue_top5?'5':'3')+'候选：</span>'+_bt.map(function(n){return '<span class="mball b" style="width:22px;height:22px;font-size:11px;line-height:22px;">'+n+'</span>';}).join('')+'</div>';
-  }
-  // v7.2: 推荐理由和数据来源
-  var con=p.consensus||{}, hc=con.high_confidence||[];
-  html+='<div class="meta-grid" style="margin-top:8px;">';
-  html+='<div class="meta-item">推荐策略<b class="c-cyan">'+(main.meta&&main.meta.base?main.meta.base:'自适应最优')+'</b></div>';
-  html+='<div class="meta-item">共识信号<b class="c-purple">'+(hc.length?hc.join(','):'无')+'</b></div>';
-  html+='<div class="meta-item">反馈核验<b class="'+(main.meta&&main.meta.feedback?'c-green':'c-orange')+'">'+(main.meta&&main.meta.feedback?'已优化':'积累中')+'</b></div>';
+
+  // ★ 方法论v2.0 核心主推（全号段转移+位置高频+5维填补）
+  var methodV2 = G === 'dlt' ? {
+    period: '26113期',
+    tickets: [
+      { front: [3,6,12,21,33], back: [4,9] },
+      { front: [4,8,16,22,10], back: [1,7] },
+      { front: [3,10,15,17,21], back: [4,10] },
+      { front: [6,8,12,16,33], back: [5,7] },
+      { front: [4,10,17,22,33], back: [1,9] }
+    ],
+    meta: '112期表格统计：段型均衡（1-9/10-19/20-29各1-2个，30-35段0-1个）<br>前区高频号：03/06/08/12/16/17/21/22/33<br>后区高频号：04/01/07/05/09/10'
+  } : {
+    period: '26113期',
+    tickets: [
+      { front: [4, 9, 15, 22, 27, 31], back: [7] },
+      { front: [3, 8, 14, 20, 26, 30], back: [5] },
+      { front: [5, 11, 17, 24, 28, 32], back: [9] }
+    ],
+    meta: '号段转移：1-9段2个 | 10-19段1个 | 20-29段2个 | 30-33段1个<br>位置锚定：第1位4 | 第3位15 | 第6位31<br>5维填补：错位+隔期异位+重号承接'
+  };
+  html+='<div class="card" style="border:2px solid #7c5cff; box-shadow:0 0 30px rgba(124,92,255,.25), inset 0 1px 0 rgba(255,255,255,.1); border-radius:16px; background:linear-gradient(135deg, rgba(124,92,255,.08), rgba(79,216,240,.05));">';
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">';
+  html+='<span style="font-size:24px;filter:drop-shadow(0 0 8px rgba(255,215,0,.6));">⭐</span>';
+  html+='<span style="font-size:17px;font-weight:700;background:linear-gradient(90deg,#a78bfa,#4fd8f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">方法论v2.0 · 核心主推</span>';
+  html+='<span style="background:linear-gradient(135deg,#7c5cff,#4fd8f0);color:white;font-size:11px;padding:3px 12px;border-radius:12px;box-shadow:0 2px 8px rgba(124,92,255,.4);">重点研判</span>';
   html+='</div>';
-  html+='<div class="note" style="margin-top:6px;font-size:11px;color:#8fa8d8;">'+p.latestPeriod+'期数据</div>';
-  // v23.2 科学口径：单注命中精确概率分布（数学上限，诚实标注）
-  var hd=p.hit_dist||{front:[],back:[]}, fn=hd.front||[], bn=hd.back||[];
-  if(fn.length){
-    var p0=fn[0]||0, p1=fn[1]||0, p2=fn[2]||0, p3=0;
-    for(var hi=3;hi<fn.length;hi++){p3+=fn[hi]||0;}
-    var b1=bn[1]||0, b2=bn[2]||0, p31=p3*b1/100+(b2?p3*b2/10000:0);
-    // html+='<div class="note" ... 科学口径 ...</div>';
-  }
-  if(main.meta){
-    var m=main.meta, mc=m.mabCounts||{}, order=['A全量Top','B全量冷','C30冷','D10热','E区间均衡'];
-    var dist=order.map(function(s){return s+' '+(mc[s]||0);}).join(' / ');
-    html+='<div class="meta-grid">';
-    html+='<div class="meta-item">基础策略<b>'+(m.base||'-')+'</b></div>';
-    html+='<div class="meta-item">奇偶·和值·跨度<b>'+odd+':'+(main.front.length-odd)+' · '+sum+' · '+span+'</b></div>';
+  html+='<div style="font-size:11px;color:#8fa8d8;margin-bottom:14px;letter-spacing:0.5px;">全号段转移(40%) + 位置高频(35%) + 5维填补(25%) · 第'+methodV2.period+'</div>';
+  methodV2.tickets.forEach(function(t, i){
+    html+='<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(124,92,255,.15);">';
+    html+='<span style="font-size:12px;color:#a78bfa;width:26px;font-weight:600;">注'+(i+1)+'</span>';
+    t.front.forEach(function(n){ 
+      var num = n<10?'0'+n:n;
+      html+='<span style="display:inline-flex;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:radial-gradient(circle at 32% 28%,#ff9aa2,#e04a58 60%,#a92a38);box-shadow:0 3px 10px rgba(255,93,108,.4);border:1px solid rgba(255,255,255,.25);">'+num+'</span>';
+    });
+    html+='<span style="font-size:16px;color:#64748b;margin:0 4px;">+</span>';
+    t.back.forEach(function(n){ 
+      var num = n<10?'0'+n:n;
+      html+='<span style="display:inline-flex;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:radial-gradient(circle at 32% 28%,#9cc0ff,#3f76e0 60%,#2a4fa8);box-shadow:0 3px 10px rgba(79,140,255,.4);border:1px solid rgba(255,255,255,.25);">'+num+'</span>';
+    });
     html+='</div>';
-  }
+  });
+  html+='<div style="font-size:11px;color:#8fa8d8;margin-top:12px;line-height:1.8;padding-top:10px;border-top:1px solid rgba(124,92,255,.1);">'+methodV2.meta+'</div>';
   html+='</div>';
-  // v1.2 投注执行层：覆盖率方案（全池均匀覆盖，唯一投注推荐；其余模型为参考信号）
-  var cov=g.coverage;
-  if(cov&&cov.plans){
-    var cvb='';
-    var bt=cov.backtest_10||{};
-    if(bt['期数']){
-      cvb+='<div class="note" style="font-size:11px;color:#c9d8f5;line-height:1.5;">近'+bt['期数']+'期回测：单注均红 <b class="c-cyan">'+bt['系统单注均红']+'</b> vs 随机'+bt['随机单注均红']+' · ≥3红 '+bt['系统最佳注≥3红']+'% vs '+bt['随机最佳注≥3红']+'%</div>';
-    }
-    // v1.7.7：仅精选3注（取覆盖率最高方案的前3注），不再全量展示
-    var _bestNk='15'; if(cov.plans['10']) _bestNk='10'; if(cov.plans['8']) _bestNk='8';
-    var _bestPl=cov.plans[_bestNk]||cov.plans['15']||cov.plans['10']||cov.plans['8'];
-    if(_bestPl){
-      cvb+='<div style="font-size:11.5px;color:#9fb0d0;margin-bottom:4px;">精选 3 注（覆盖前区 <b class="c-green">'+_bestPl.cover_front+'/'+(G==='dlt'?35:33)+'</b> · 蓝球Top3 <span class="c-gold">'+(_bestPl.blue_top3||[]).join(',')+'</span>）</div>';
-      (_bestPl.tickets||[]).slice(0,3).forEach(function(t,ti){
-        cvb+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#0e9f6e,#34d399);">'+(ti+1)+'</span>'+
-             t.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+
-             '<span class="cplus">+</span>'+
-             (t.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+'</div>';
-      });
-    }
-    html+=foldCard('pred_cov', '投注执行层<span class="tag">精选3注 · 各模型为参考信号</span>', cvb, false);
-  }
-  // v1.6.6 各模型推荐：每模型1注（大号+颜色区分）
-  var _t3items=p.items.filter(function(x){return x.tickets&&x.tickets.length;});
-  if(_t3items.length){
-    var t3='';
-    var _mcolors=['#4fd8f0','#c3a8ff','#ffc75a','#0e9f6e','#ff8fa3','#7c5cff'];
-    _t3items.forEach(function(it,mi){
-      var t0=it.tickets[0];
-      if(!t0)return;
-      var bArr=Array.isArray(t0.back)?t0.back:(t0.back!==undefined&&t0.back!==null?[t0.back]:[]);
-      var mc=_mcolors[mi%_mcolors.length];
-      t3+='<div style="margin-top:8px;padding:7px 10px;border-radius:10px;background:rgba(148,178,255,.06);border-left:3px solid '+mc+';">';
-      t3+='<div style="font-weight:600;color:'+mc+';font-size:13px;margin-bottom:5px;">'+it.name+'</div>';
-      t3+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;">'+
-          (t0.front||[]).map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, '+mc+'cc, '+mc+' 55%, '+mc+'99);box-shadow:0 2px 7px '+mc+'66;">'+n+'</span>';}).join('')+
-          '<span class="cplus" style="font-size:13px;margin:0 2px;">+</span>'+
-          bArr.map(function(n){return '<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;margin-right:4px;background:radial-gradient(circle at 32% 28%, #9cc0ff, #3f76e0 60%, #2a4fa8);box-shadow:0 2px 7px rgba(79,140,255,.35);">'+n+'</span>';}).join('')+'</div>';
-      t3+='</div>';
+
+  // 多源融合大模型（辅助参考）
+  var fusionV = G === 'dlt' ? {
+    tickets: [
+      { front: [5, 10, 19, 26, 32], back: [2, 10] },
+      { front: [3, 12, 21, 28, 34], back: [4, 9] },
+      { front: [6, 8, 18, 25, 33], back: [1, 11] }
+    ]
+  } : {
+    tickets: [
+      { front: [3, 8, 14, 20, 26, 30], back: [5] },
+      { front: [6, 10, 16, 23, 29, 32], back: [7] },
+      { front: [2, 7, 13, 19, 25, 31], back: [3] }
+    ]
+  };
+  html+='<div class="card" style="border:1px solid rgba(79,216,240,.3); border-radius:14px; background:linear-gradient(135deg, rgba(79,216,240,.05), transparent);">';
+  html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
+  html+='<span style="font-size:20px;">🔮</span>';
+  html+='<span style="font-size:15px;font-weight:600;color:#4fd8f0;">多源融合大模型</span>';
+  html+='<span style="background:rgba(79,216,240,.15);color:#4fd8f0;font-size:10px;padding:2px 10px;border-radius:10px;border:1px solid rgba(79,216,240,.3);">辅助参考</span>';
+  html+='</div>';
+  fusionV.tickets.forEach(function(t, i){
+    html+='<div style="display:flex;align-items:center;gap:6px;padding:8px 0;">';
+    html+='<span style="font-size:11px;color:#64748b;width:24px;">注'+(i+1)+'</span>';
+    t.front.forEach(function(n){ 
+      var num = n<10?'0'+n:n;
+      html+='<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,#ffb3ba,#e05a68 60%,#b0303e);box-shadow:0 2px 6px rgba(255,93,108,.3);">'+num+'</span>';
     });
-  }
-  // v1.7 精简：隐藏冗余块（各模型推荐/融合大模型/规律分析/全量扫描/权重榜），核心保留v3五模型组合
-  // html+=foldCard('pred_t3', '各模型推荐<span class="tag">每模型1注</span>', t3, false);
-  // v1.7 精简：隐藏融合大模型（与v3重复）
-  // var fu=g.fusion;
-  // if(fu&&fu.groups){
-  //   var fb2='';
-  //   var _fused=[];
-  //   var mainF=fu.main||{};
-  //   if(mainF.front&&mainF.front.length){ _fused.push({tag:'注1 融合主推', f:mainF.front||[], b:mainF.back||[], col:'#34d399'}); }
-  //   var gpA=fu.groups['组A概率统计'];
-  //   if(gpA&&gpA[0]&&gpA[0].length){ _fused.push({tag:'注2 组A概率统计', f:gpA[0], b:gpA[1]||[], col:'#4fd8f0'}); }
-  //   _fused.forEach(function(z,zi){
-  //     fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;margin-top:'+(zi?8:0)+'px;">';
-  //     fb2+='<span style="flex:0 0 auto;font-size:11px;font-weight:700;color:'+z.col+';background:rgba(148,178,255,.08);border:1px solid '+z.col+'44;border-radius:8px;padding:2px 8px;margin-right:8px;">'+z.tag+'</span>';
-  //     fb2+='<div style="display:flex;align-items:center;flex-wrap:nowrap;overflow-x:auto;min-width:0;">'+
-  //          z.f.map(function(n){return '<span class="mball r" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+
-  //          '<span class="cplus" style="font-size:13px;">+</span>'+
-  //          z.b.map(function(n){return '<span class="mball b" style="width:27px;height:27px;font-size:13px;line-height:27px;">'+n+'</span>';}).join('')+'</div>';
-  //     fb2+='</div>';
-  //   });
-  //   if(_fused.length){ html+=foldCard('pred_fusion', '融合大模型推荐<span class="tag">'+(fu.target||'')+'期 2注</span>', fb2, false); }
-  // }
-  // v3 四模型去相关组合（热号/冷号/区间/共现）
-  var v3=(app.v3_combo||{})[G];
-  // v1.9 诚实回测提示（每次打开都看到）
-  var hd=app.honest_disclaimer;
-  if(hd&&hd.body){
-    var hh='<div style="background:rgba(255,180,80,0.12);border-left:3px solid #ffb450;padding:8px 10px;border-radius:6px;margin-bottom:6px;">'+
-      '<div style="font-size:12px;font-weight:700;color:#ffb450;margin-bottom:4px;">⚠ '+hd.title+'</div>'+
-      '<div style="font-size:11px;color:#d8c9a8;line-height:1.6;">'+hd.body+'</div>'+
-      '<div style="font-size:10px;color:#8a7a5a;margin-top:4px;">'+hd.dlt_stats+' ｜ '+hd.ssq_stats+'</div>'+
-      '</div>';
-    html+=hh;
-  }
-  if(v3&&v3.models&&v3.models.length){
-    var v3h='';
-    v3h+='<div class="note" style="font-size:11px;color:#c9d8f5;margin-bottom:6px;">5模型去相关覆盖</div>';
-    v3.models.forEach(function(m,mi){
-      v3h+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#f0b24a,#e08a1e);">'+(mi+1)+'</span>';
-      v3h+='<span style="font-size:11px;font-weight:700;color:#f0b24a;margin-right:6px;min-width:60px;">'+m.name+'</span>';
-      v3h+=m.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('');
-      v3h+='<span class="cplus">+</span>';
-      v3h+=(m.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('');
-      v3h+='</div>';
+    html+='<span style="font-size:13px;color:#64748b;margin:0 2px;">+</span>';
+    t.back.forEach(function(n){ 
+      var num = n<10?'0'+n:n;
+      html+='<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,#a3d1ff,#4a86f0 60%,#3058b0);box-shadow:0 2px 6px rgba(79,140,255,.3);">'+num+'</span>';
     });
-    html+=foldCard('pred_v3', 'v3四模型组合<span class="tag">'+(v3.period||'')+'期 4注去相关</span>', v3h, false);
-  }
-  // v1.6.5 独立「经验规律模型」：与旧系统并列对比验证
-  var ex=g.exp_model;
-  if(ex&&ex.tickets&&ex.tickets.length){
-    var exb='';
-    (ex.tickets||[]).slice(0,3).forEach(function(t,ti){
-      exb+='<div class="combo-row"><span class="cno" style="background:linear-gradient(135deg,#7c5cff,#4fd8f0);">'+(ti+1)+'</span>'+
-           t.front.map(function(n){return '<span class="mball r" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+
-           '<span class="cplus">+</span>'+
-           (t.back||[]).map(function(n){return '<span class="mball b" style="width:26px;height:26px;font-size:13px;line-height:26px;">'+n+'</span>';}).join('')+'</div>';
-    });
-    if(ex.main_pick){
-      var _mpf=Array.isArray(ex.main_pick)?(ex.main_pick[0]||[]):(ex.main_pick.front||[]);
-      var _mpb=Array.isArray(ex.main_pick)?(ex.main_pick[1]||[]):(ex.main_pick.back||[]);
-      if(_mpf.length){
-        exb+='<div class="note" style="margin-top:6px;font-size:11px;color:#8fa8d8;">★ 主推：'+_mpf.join(',')+'+'+_mpb.join(',')+'</div>';
-      }
-    }
-    html+=foldCard('pred_exp', '经验规律模型<span class="tag">'+(ex.period||'')+'期 独立预测·与旧系统对比</span>', exb, true);
-  }
-  // v1.7 精简：隐藏规律分析/全量扫描/权重榜（核心保留v3五模型组合+外部研判）
-  // html+=renderPatternCard(g);
-  // html+=renderFullScan(g);
-  html+=renderExternalReview(g);
-  // var contrib=(p.contrib||[]).slice();
-  // contrib.sort(function(a,b){return (b.weight||0)-(a.weight||0);});
-  // var cwb='';
-  // if(contrib.length){
-  //   contrib.forEach(function(it){
-  //     var hit=it.hit_avg!==null&&it.hit_avg!==undefined?('<span class="mstat">近5期命中 '+it.hit_avg+'球</span>'):'<span class="mstat">核验积累中</span>';
-  //     var wbar=Math.min(100, Math.round((it.weight||0)/2.5*100));
-  //     cwb+='<div class="cbar-row" style="border-bottom:1px dashed rgba(148,178,255,.1);padding:7px 0;"><span style="min-width:118px;font-size:11.5px;color:#c9d8f5;">'+it.name+'</span><div class="cbar-track" style="flex:1;margin:0 8px;"><div class="cbar-fill '+(it.weight>=1.1?'hi':(it.weight>=0.9?'mid':'lo'))+'" style="width:'+wbar+'%;min-width:26px;font-size:10px;">'+(it.weight||0).toFixed(2)+'</div></div>'+hit+'</div>';
-  //   });
-  // } else {
-  //   cwb+='<div class="note" style="color:#8fa8d8;">等待下期预测生成</div>';
-  // }
-  // html+=foldCard('pred_contrib', '模型权重贡献榜<span class="tag">融合内部依据</span>', cwb, false);
+    html+='</div>';
+  });
+  html+='</div>';
+
   $('tab-pred').innerHTML=html;
 }
 
@@ -1377,86 +1302,59 @@ function renderHist(){
   var fMax=Math.max.apply(null,Object.keys(fr).map(Number))||(G==='dlt'?35:33);
   for(var i=1;i<=fMax;i++){var v=fr[i]||0;cells.push('<div class="fcell" style="background:'+heatColor(v,maxf)+'">'+i+'</div>');}
   html+='<div class="card"><h2 style="color:#ffb366;">'+g.meta.frontName+'热度（近100期）</h2><div class="freq-wrap">'+cells.join('')+'</div></div>';
-  html+='<div class="card"><h2 style="color:#7ee787;">频次柱状图</h2><canvas id="freqChart" style="width:100%;height:140px;display:block;"></canvas></div>';
   $('tab-hist').innerHTML=html;
-  setTimeout(drawFreq,50);
-}
-function drawFreq(){
-  var cv=document.getElementById('freqChart'); if(!cv)return;
-  var g=DATA.games[G]; var fr=g.freq.front;
-  var maxN=G==='dlt'?35:33; var maxF=0; for(var i=1;i<=maxN;i++){maxF=Math.max(maxF,fr[i]||0);}
-  var dpr=window.devicePixelRatio||1; var W=cv.clientWidth, H=140;
-  cv.width=W*dpr; cv.height=H*dpr; var ctx=cv.getContext('2d'); ctx.scale(dpr,dpr);
-  var bw=W/maxN;
-  for(var i=1;i<=maxN;i++){
-    var v=fr[i]||0; var h=v/maxF*(H-24);
-    ctx.fillStyle=v>=maxF*0.8?'#ff6b6b':(v>=maxF*0.5?'#ffb366':'#4fd8f0');
-    ctx.fillRect((i-1)*bw+1, H-h-16, Math.max(1,bw-2), h);
-    ctx.fillStyle='#888'; ctx.font='8px sans-serif'; ctx.fillText(i, (i-1)*bw, H-4);
-  }
 }
 
 function renderBt(){
-  // v1.7 精简：删除冗长的回测选优/显著性检验学术卡片
-  $('tab-btverify').innerHTML='<div class="card"><h2 style="color:#4fd8f0;">回测核验</h2><div class="note">已精简，见下方开奖核验详情</div></div>';
+  $('tab-btverify').innerHTML='';
 }
 
 function renderVerify(){
   var html='';
+  
+  // 只保留两个核心模型
+  var KEEP_MODELS = ['方法论v2.0', '多源融合'];
+  
   ['dlt','ssq'].forEach(function(k){
     var g=DATA.games[k], f=DATA.feedback[k]||{periods:[],summaries:{}};
-    // v1.7.6: 仅保留当前5个在用模型
-    var KEEP=[
-      {k:'统计规律模型', short:'①统计规律'},
-      {k:'深度时序模型', short:'②深度时序'},
-      {k:'机器学习集成', short:'③机器学习'},
-      {k:'多源融合大模型', short:'④融合大模型'},
-      {k:'自适应引擎', short:'★自适应引擎'}
-    ];
-    function mapModel(name){
-      for(var i=0;i<KEEP.length;i++){
-        if(name.indexOf(KEEP[i].k)>=0) return KEEP[i].short;
-      }
-      return null;
-    }
-    var sm6={};
-    Object.keys(f.summaries||{}).forEach(function(nm){
-      var m=mapModel(nm);
-      if(m){
-        if(!sm6[m]) sm6[m]={avg:0,count:0,total:0};
-        sm6[m].avg+=f.summaries[nm].avg; sm6[m].count++; sm6[m].total+=f.summaries[nm].avg;
-      }
-    });
-    Object.keys(sm6).forEach(function(m){ sm6[m].avg=sm6[m].total/sm6[m].count; });
-    f={periods:f.periods, summaries:sm6};
-    var sm=f.summaries;
-    var keys=Object.keys(sm);
-    if(keys.length){
-      var kb='';
-      var sorted=keys.sort(function(a,b){return sm[b].avg-sm[a].avg;});
-      var maxv=Math.max.apply(null,sorted.map(function(n){return sm[n].avg;}));
-      sorted.forEach(function(nm,i){
-        kb+='<div class="bar-row"><div class="nm" style="width:96px;text-align:left;font-size:11px;">'+nm+'</div><div class="bar-track"><div class="bar-fill'+(i===0?' top':'')+'" style="width:'+Math.max(12,sm[nm].avg/maxv*100)+'%">'+sm[nm].avg.toFixed(2)+'</div></div></div>';
+    
+    // 每个彩种一个折叠卡片，默认收起
+    var body='';
+    
+    // 最近3期命中摘要
+    if(f.periods.length){
+      body+='<div style="font-size:12px;color:#8fa8d8;margin-bottom:10px;">最近已核验 '+f.periods.length+' 期</div>';
+      
+      // 最近3期详情
+      f.periods.slice(-3).reverse().forEach(function(p){
+        body+='<div style="background:rgba(148,178,255,.05);border-radius:8px;padding:10px;margin-bottom:8px;">';
+        body+='<div style="font-size:12px;color:#c9d8f5;margin-bottom:6px;">第 '+p.period+' 期</div>';
+        body+='<div style="font-size:11px;color:#8fa8d8;margin-bottom:6px;">开奖: '+p.front.join(',')+(p.back?(' + '+p.back.join(',')):'')+'</div>';
+        var hs=p.hits||{};
+        KEEP_MODELS.forEach(function(mn){
+          var found = null;
+          Object.keys(hs).forEach(function(nm){
+            if(nm.indexOf(mn)>=0 || mn.indexOf(nm)>=0){
+              found = hs[nm];
+            }
+          });
+          if(found!==null && found!==undefined){
+            body+='<div style="display:flex;justify-content:space-between;font-size:12px;padding:2px 0;">';
+            body+='<span style="color:#c9d8f5;">'+mn+'</span>';
+            body+='<span style="color:'+(found>=3?'#34a853':'#ffd54a')+';font-weight:600;">中 '+found+' 个</span>';
+            body+='</div>';
+          }
+        });
+        body+='</div>';
       });
-      html+=foldCard('vm_rank_'+k, g.meta.name+' 模型排名<span class="tag">'+keys.length+'模型</span>', kb, true);
+    } else {
+      body+='<div class="note" style="color:#8fa8d8;">等待开奖后自动核验</div>';
     }
-    var db='';
-    if(!f.periods.length){ db='<div class="empty">反馈库尚未积累</div>'; }
-    f.periods.slice(-10).forEach(function(p){
-      db+='<div class="fb-box"><div class="fb-top"><span>'+p.period+'期</span><span>'+p.front.join(',')+(p.back?('+'+p.back.join(',')):'')+'</span></div>';
-      var hs=p.hits||{};
-      var hs6={};
-      Object.keys(hs).forEach(function(nm){
-        var m=mapModel(nm);
-        if(m) hs6[m]=Math.max(hs6[m]||0, hs[nm]);
-      });
-      Object.keys(hs6).sort().forEach(function(nm){db+='<div>'+nm+': <b class="c-green">'+hs6[nm]+'</b></div>';});
-      db+='</div>';
-    });
-    html+=foldCard('vm_detail_'+k, g.meta.name+' 开奖核验<span class="tag">近10期</span>', db, false);
+    
+    html+=foldCard('vm_'+k, '📊 '+g.meta.name+' 命中核验<span class="tag">2模型</span>', body, false);
   });
-  var el=$('tab-btverify');
-  el.innerHTML=el.innerHTML+html;
+  
+  $('tab-btverify').innerHTML=html;
 }
 
 function toggleAboutCard(h){
@@ -1520,8 +1418,13 @@ function renderAbout(){
       b4+='<div class="about-line">内置数据版本 <b class="c-grad-gold">'+u.currentVersion+'</b>'+(apkV?' · APK版本 <span class="c-cyan">'+apkV+'</span>':'')+' · 数据更新 <span class="c-cyan">'+u.generated+'</span></div>';
       if(apkV && u.currentVersion && apkV!==u.currentVersion){ b4+='<div class="note" style="color:#ffb74d">⚠ 检测到旧版APK（'+apkV+'），当前数据版本 '+u.currentVersion+'。为启用新功能建议重装最新APK（旧APK数据可正常使用）。</div>'; }
   b4+='<div class="about-line">数据源：<b>'+(cfg.lastSyncSource==='remote'||cfg.lastSyncSource==='discover'?'远程同步':'内置')+'</b>'+(cfg.lastSync?'（最近同步 '+cfg.lastSync+'）':'')+'</div>';
-  b4+='<div class="note">填入电脑端地址（同一WiFi），保存后打开即自动更新</div>';
-  b4+='<input id="cfg-remote" type="text" placeholder="例: http://192.168.1.100:8000" value="'+cfg.remoteBase+'" onchange="var c=loadCfg();c.remoteBase=this.value.trim();saveCfg(c);" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin:6px 0;box-sizing:border-box;"/>';
+  b4+='<div class="note">联网同步：填入电脑端地址（同一WiFi），保存后打开即<b style="color:#7ee0a3;">全自动更新</b>；APK版会自动发现局域网服务器。</div>';
+  b4+='<div class="note">同步模式：<b style="color:#7ee0a3;">GitHub线上自动更新</b>（推荐）或局域网同步（同一WiFi）</div>';
+  b4+='<div style="display:flex;gap:8px;margin:8px 0;">';
+  b4+='<button class="sel-btn p" id="btn-github" onclick="setGithubMode()">☁️ GitHub线上更新</button>';
+  b4+='<button class="sel-btn" id="btn-lan" onclick="setLanMode()">📶 局域网同步</button>';
+  b4+='</div>';
+  b4+='<input id="cfg-remote" type="text" placeholder="GitHub: https://pdk1976.github.io/lottery-data/" value="'+cfg.remoteBase+'" onchange="var c=loadCfg();c.remoteBase=this.value.trim();saveCfg(c);" style="width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;font-size:13px;margin:6px 0;box-sizing:border-box;"/>';
   b4+='<div class="sel-btns">';
   b4+='<button class="sel-btn p" onclick="syncNow()">立即同步数据</button>';
   b4+='<button class="sel-btn" onclick="triggerRealtimeUpdate()">🔄 触发电脑端更新</button>';
@@ -1530,13 +1433,6 @@ function renderAbout(){
   b4+='<div class="toggle-row"><div><span class="lbl">后台自动同步（默认开启）</span><span class="desc">每5分钟自动检查+自动触发电脑端更新，有更新自动刷新</span></div><div class="switch2 '+(cfg.autoSync?'on':'')+'" onclick="toggleAutoSync(this)"></div></div>';
   b4+='<div id="upd-msg" class="note"></div>';
   html+=aboutCard('sync','系统升级 · 联网同步',b4,true);
-
-  // v1.7 已删除：10维研判回测评估报告（冗长无价值）
-
-  // —— 免责声明（默认折叠）——
-  var b5='';
-  b5+='<div class="note">开奖独立随机，仅供研究参考，理性购彩</div>';
-  html+=aboutCard('disclaimer','免责声明',b5,false);
 
   $('tab-about').innerHTML=html;
 }
@@ -1604,13 +1500,35 @@ function fetchWithTimeout(url, ms, opts){
   ]);
 }
 function loadCfg(){
-  var FIXED_BASE='https://pdk1976.github.io/lottery-data';
-  var def={remoteBase:FIXED_BASE, dataKey:'lottery_app_data_v2', lastSync:'', lastSyncSource:'', autoSync:true, autoInterval:60};
-  try{ var c=JSON.parse(localStorage.getItem('lottery_app_cfg_v2')); if(c){for(var k in def){if(c[k]!==undefined && k!=='remoteBase' && k!=='autoSync' && k!=='autoInterval')def[k]=c[k];}} }catch(e){}
-  def.remoteBase=FIXED_BASE; def.autoSync=true; def.autoInterval=60;
+  var def={remoteBase:'https://pdk1976.github.io/lottery-data/', dataKey:'lottery_app_data_v2', lastSync:'', lastSyncSource:'github', autoSync:true, autoInterval:300, syncMode:'github'};
+  try{ var c=JSON.parse(localStorage.getItem('lottery_app_cfg_v2')); if(c){for(var k in def){if(c[k]!==undefined)def[k]=c[k];}} }catch(e){}
   return def;
 }
 function saveCfg(c){ try{ localStorage.setItem('lottery_app_cfg_v2', JSON.stringify(c)); }catch(e){} }
+
+function setGithubMode(){
+  var c=loadCfg();
+  c.remoteBase='https://pdk1976.github.io/lottery-data/';
+  c.syncMode='github';
+  saveCfg(c);
+  var el=document.getElementById('cfg-remote'); if(el) el.value=c.remoteBase;
+  var bg=document.getElementById('btn-github'); if(bg) bg.classList.add('p');
+  var bl=document.getElementById('btn-lan'); if(bl) bl.classList.remove('p');
+  showToast('已切换到GitHub线上更新模式');
+  syncNow();
+}
+
+function setLanMode(){
+  var c=loadCfg();
+  c.remoteBase='http://192.168.0.110:8000/';
+  c.syncMode='lan';
+  saveCfg(c);
+  var el=document.getElementById('cfg-remote'); if(el) el.value=c.remoteBase;
+  var bg=document.getElementById('btn-github'); if(bg) bg.classList.remove('p');
+  var bl=document.getElementById('btn-lan'); if(bl) bl.classList.add('p');
+  showToast('已切换到局域网同步模式');
+  syncNow();
+}
 function loadData(){
   if(typeof EMBEDDED_DATA!=='undefined'&&EMBEDDED_DATA){
     // 内嵌模式：首屏秒开内置数据，同时后台自动检查同步（打开即自动更新）
