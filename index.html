@@ -1293,7 +1293,7 @@ function renderHist(){
   ['dlt','ssq'].forEach(function(k){html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderHist();">'+DATA.games[k].meta.name+'</button>';});
   html+='</div>';
   html+='<div class="card"><h2 style="color:#4fd8f0;">最近开奖 <span class="tag">'+g.meta.latestPeriod+' 期为止</span></h2>';
-  g.history.slice().reverse().forEach(function(h){
+  g.history.forEach(function(h){
     html+='<div class="his-row"><div class="p c-gold">'+h.period+'</div><div class="balls">'+fmtHBalls(h.front,'r')+fmtHBalls(h.back,'b')+'</div></div>';
   });
   html+='</div>';
