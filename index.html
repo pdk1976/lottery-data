@@ -1113,10 +1113,10 @@ function modelColor(name){
 }
 
 function renderJudge10(){
+  // 10维功能已隐藏，界面不展示
+  $('tab-judge10').innerHTML='';
+  return;
   var g=DATA.games[G], html='';
-  html+='<div class="switch">';
-  ['dlt','ssq'].forEach(function(k){ html+='<button class="'+(k===G?'on':'')+'" onclick="G=\''+k+'\';renderJudge10();">'+DATA.games[k].meta.name+'</button>'; });
-  html+='</div>';
 
   // 现在是辅助校验工具，不独立出号
   html+='<div class="card" style="border-color:rgba(126,224,163,.4);background:linear-gradient(160deg,rgba(126,224,163,.08),rgba(8,15,32,.6));">';
