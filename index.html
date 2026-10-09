@@ -1189,84 +1189,35 @@ function renderPred(){
   });
   html+='</div>';
 
-  // ★ 方法论v2.0 核心主推（全号段转移+位置高频+5维填补）
-  var methodV2 = G === 'dlt' ? {
-    period: '26113期',
-    tickets: [
-      { front: [3,6,12,21,33], back: [4,9] },
-      { front: [4,8,16,22,10], back: [1,7] },
-      { front: [3,10,15,17,21], back: [4,10] },
-      { front: [6,8,12,16,33], back: [5,7] },
-      { front: [4,10,17,22,33], back: [1,9] }
-    ],
-    meta: '112期表格统计：段型均衡（1-9/10-19/20-29各1-2个，30-35段0-1个）<br>前区高频号：03/06/08/12/16/17/21/22/33<br>后区高频号：04/01/07/05/09/10'
-  } : {
-    period: '26113期',
-    tickets: [
-      { front: [4, 9, 15, 22, 27, 31], back: [7] },
-      { front: [3, 8, 14, 20, 26, 30], back: [5] },
-      { front: [5, 11, 17, 24, 28, 32], back: [9] }
-    ],
-    meta: '号段转移：1-9段2个 | 10-19段1个 | 20-29段2个 | 30-33段1个<br>位置锚定：第1位4 | 第3位15 | 第6位31<br>5维填补：错位+隔期异位+重号承接'
-  };
+  // 段型转移覆盖核心推荐（直接读app_data里的最新预测）
+  var pred = g.predict || {period:'--', tickets:[], method:'段型转移覆盖'};
   html+='<div class="card" style="border:2px solid #7c5cff; box-shadow:0 0 30px rgba(124,92,255,.25), inset 0 1px 0 rgba(255,255,255,.1); border-radius:16px; background:linear-gradient(135deg, rgba(124,92,255,.08), rgba(79,216,240,.05));">';
   html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">';
   html+='<span style="font-size:24px;filter:drop-shadow(0 0 8px rgba(255,215,0,.6));">⭐</span>';
-  html+='<span style="font-size:17px;font-weight:700;background:linear-gradient(90deg,#a78bfa,#4fd8f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">方法论v2.0 · 核心主推</span>';
+  html+='<span style="font-size:17px;font-weight:700;background:linear-gradient(90deg,#a78bfa,#4fd8f0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">段型转移覆盖 · 核心推荐</span>';
   html+='<span style="background:linear-gradient(135deg,#7c5cff,#4fd8f0);color:white;font-size:11px;padding:3px 12px;border-radius:12px;box-shadow:0 2px 8px rgba(124,92,255,.4);">重点研判</span>';
   html+='</div>';
-  html+='<div style="font-size:11px;color:#8fa8d8;margin-bottom:14px;letter-spacing:0.5px;">全号段转移(40%) + 位置高频(35%) + 5维填补(25%) · 第'+methodV2.period+'</div>';
-  methodV2.tickets.forEach(function(t, i){
-    html+='<div style="display:flex;align-items:center;gap:8px;padding:10px 0;border-bottom:1px solid rgba(124,92,255,.15);">';
+  html+='<div style="font-size:11px;color:#8fa8d8;margin-bottom:14px;letter-spacing:0.5px;">先定号段转移方向，再段内配号 · 第'+pred.period+'期</div>';
+  pred.tickets.forEach(function(t, i){
+    html+='<div style="padding:10px 0;border-bottom:1px solid rgba(124,92,255,.15);">';
+    html+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">';
     html+='<span style="font-size:12px;color:#a78bfa;width:26px;font-weight:600;">注'+(i+1)+'</span>';
-    t.front.forEach(function(n){ 
+    t.front.forEach(function(n){
       var num = n<10?'0'+n:n;
       html+='<span style="display:inline-flex;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:radial-gradient(circle at 32% 28%,#ff9aa2,#e04a58 60%,#a92a38);box-shadow:0 3px 10px rgba(255,93,108,.4);border:1px solid rgba(255,255,255,.25);">'+num+'</span>';
     });
     html+='<span style="font-size:16px;color:#64748b;margin:0 4px;">+</span>';
-    t.back.forEach(function(n){ 
+    t.back.forEach(function(n){
       var num = n<10?'0'+n:n;
       html+='<span style="display:inline-flex;width:34px;height:34px;border-radius:50%;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;background:radial-gradient(circle at 32% 28%,#9cc0ff,#3f76e0 60%,#2a4fa8);box-shadow:0 3px 10px rgba(79,140,255,.4);border:1px solid rgba(255,255,255,.25);">'+num+'</span>';
     });
     html+='</div>';
-  });
-  html+='<div style="font-size:11px;color:#8fa8d8;margin-top:12px;line-height:1.8;padding-top:10px;border-top:1px solid rgba(124,92,255,.1);">'+methodV2.meta+'</div>';
-  html+='</div>';
-
-  // 多源融合大模型（辅助参考）
-  var fusionV = G === 'dlt' ? {
-    tickets: [
-      { front: [5, 10, 19, 26, 32], back: [2, 10] },
-      { front: [3, 12, 21, 28, 34], back: [4, 9] },
-      { front: [6, 8, 18, 25, 33], back: [1, 11] }
-    ]
-  } : {
-    tickets: [
-      { front: [3, 8, 14, 20, 26, 30], back: [5] },
-      { front: [6, 10, 16, 23, 29, 32], back: [7] },
-      { front: [2, 7, 13, 19, 25, 31], back: [3] }
-    ]
-  };
-  html+='<div class="card" style="border:1px solid rgba(79,216,240,.3); border-radius:14px; background:linear-gradient(135deg, rgba(79,216,240,.05), transparent);">';
-  html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">';
-  html+='<span style="font-size:20px;">🔮</span>';
-  html+='<span style="font-size:15px;font-weight:600;color:#4fd8f0;">多源融合大模型</span>';
-  html+='<span style="background:rgba(79,216,240,.15);color:#4fd8f0;font-size:10px;padding:2px 10px;border-radius:10px;border:1px solid rgba(79,216,240,.3);">辅助参考</span>';
-  html+='</div>';
-  fusionV.tickets.forEach(function(t, i){
-    html+='<div style="display:flex;align-items:center;gap:6px;padding:8px 0;">';
-    html+='<span style="font-size:11px;color:#64748b;width:24px;">注'+(i+1)+'</span>';
-    t.front.forEach(function(n){ 
-      var num = n<10?'0'+n:n;
-      html+='<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,#ffb3ba,#e05a68 60%,#b0303e);box-shadow:0 2px 6px rgba(255,93,108,.3);">'+num+'</span>';
-    });
-    html+='<span style="font-size:13px;color:#64748b;margin:0 2px;">+</span>';
-    t.back.forEach(function(n){ 
-      var num = n<10?'0'+n:n;
-      html+='<span style="display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;background:radial-gradient(circle at 32% 28%,#a3d1ff,#4a86f0 60%,#3058b0);box-shadow:0 2px 6px rgba(79,140,255,.3);">'+num+'</span>';
-    });
+    if(t.seg){
+      html+='<div style="font-size:10px;color:#9fb0d0;margin-top:6px;margin-left:34px;">段型：'+t.seg+'</div>';
+    }
     html+='</div>';
   });
+  html+='<div style="font-size:11px;color:#8fa8d8;margin-top:12px;line-height:1.8;padding-top:10px;border-top:1px solid rgba(124,92,255,.1);">研判逻辑：先统计上期段型，从全历史转移概率选Top5下期段型，5注分散覆盖不押单注，避开极端偏态组合。</div>';
   html+='</div>';
 
   $('tab-pred').innerHTML=html;
