@@ -1790,14 +1790,12 @@ loadData().then(function(d){
   startAutoSync();
 }).catch(function(e){
   $('hd-sub').textContent='数据加载失败：请通过 http 服务器访问或重新导出数据';
-  $('tab-pred').innerHTML='<div class="empty">无法加载 app_data.json（'+e.message+'）</div>';
+  $('tab-pred').innerHTML='<div class="empty">无法加载 app_data.json（'+e.message+'），请下拉刷新重试</div>';
 });
 
-// PWA 离线缓存（仅 https/localhost 生效，失败不影响使用）
+// 禁用serviceWorker强缓存，避免打开时用旧缓存导致预测栏空白
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function(){
-    navigator.serviceWorker.register('sw.js').catch(function(){});
-  });
+  navigator.serviceWorker.getRegistrations().then(function(regs){ regs.forEach(function(r){r.unregister();}); }).catch(function(){});
 }
 </script>
 </body>
