@@ -1,5 +1,5 @@
 {
-  "generated": "2026-10-07 21:58",
+  "generated": "2026-10-12",
   "games": {
     "dlt": {
       "meta": {
@@ -3536,7 +3536,7 @@
         "backPick": 1,
         "drawDays": "周二 / 周四 / 周日",
         "totalPeriods": 3511,
-        "latestPeriod": "26114"
+        "latestPeriod": "26116"
       },
       "predictions": {
         "period": "26113",
